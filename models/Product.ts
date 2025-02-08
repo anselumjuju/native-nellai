@@ -1,7 +1,13 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import { nanoid } from "nanoid";
+import slugify from "slugify";
+import Category from "./Category";
+import Location from "./Location";
 
 interface Product extends Document {
+	id: string;
 	name: string;
+	slug: string;
 	images: {
 		main: string;
 		banner: string;
@@ -13,29 +19,52 @@ interface Product extends Document {
 	quantity: number;
 	originalPrice: number;
 	discountPrice: number;
-	categoryId: Types.ObjectId;
-	locationId: Types.ObjectId;
+	categoryId: string;
+	locationId: string;
 	isBanner: boolean;
 	createdAt: Date;
+	updatedAt: Date;
 }
 
-const ProductSchema = new Schema<Product>({
-	name: { type: String, required: true },
-	images: {
-		main: { type: String, required: true },
-		banner: { type: String, required: true },
-		others: { type: [String], required: true },
+const ProductSchema = new Schema<Product>(
+	{
+		id: {
+			type: String,
+			default: () => nanoid(),
+		},
+		name: { type: String, required: true },
+		slug: { type: String, unique: true },
+		images: {
+			main: { type: String, required: true },
+			banner: { type: String, required: true },
+			others: { type: [String], required: true },
+		},
+		caption: { type: String, required: true },
+		description: { type: String, required: true },
+		about: { type: String, required: true },
+		quantity: { type: Number, required: true, min: 0 },
+		originalPrice: { type: Number, required: true, min: 0 },
+		discountPrice: { type: Number, required: true, min: 0 },
+		categoryId: { type: String, ref: "Category", required: true },
+		locationId: { type: String, ref: "Location", required: true },
+		isBanner: { type: Boolean, default: false },
 	},
-	caption: { type: String, required: true },
-	description: { type: String, required: true },
-	about: { type: String, required: true },
-	quantity: { type: Number, required: true },
-	originalPrice: { type: Number, required: true },
-	discountPrice: { type: Number, required: true },
-	categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-	locationId: { type: Schema.Types.ObjectId, ref: "Location", required: true },
-	isBanner: { type: Boolean, default: false },
-	createdAt: { type: Date, default: Date.now },
+	{ timestamps: true }
+);
+
+ProductSchema.pre("save", async function (next) {
+	if (!this.slug) {
+		this.slug = slugify(this.name, { lower: true, strict: true });
+	}
+	const categoryExists = await Category.findById(this.categoryId);
+	if (!categoryExists) {
+		throw new Error("Invalid categoryId: Category does not exist");
+	}
+	const locationExists = await Location.findById(this.locationId);
+	if (!locationExists) {
+		throw new Error("Invalid locationId: Location does not exist");
+	}
+	next();
 });
 
 export default mongoose.models.Product || mongoose.model<Product>("Product", ProductSchema);
