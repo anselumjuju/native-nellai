@@ -1,10 +1,7 @@
-import ThemeToggle from '@/components/theme-toggler';
-
 const Admin = () => {
   return (
-    <div className='w-full flex items-center justify-between py-5 px-10'>
-      <h1>Admin Page</h1>
-      <ThemeToggle />
+    <div className='flex flex-1 items-center justify-center'>
+      <p className='text-base font-semibold'>Admin Dashboard</p>
     </div>
   );
 };
