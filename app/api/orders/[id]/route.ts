@@ -2,13 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import Order from "@/models/Order";
 
-interface paramInterface {
-	params: {
-		id: string;
-	};
-}
-
-export async function GET({ params }: paramInterface) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const id = (await params).id;
 	await connectToDatabase();
 	try {
@@ -19,7 +13,7 @@ export async function GET({ params }: paramInterface) {
 	}
 }
 
-export async function DELETE({ params }: paramInterface) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const id = (await params).id;
 	await connectToDatabase();
 	try {
@@ -30,7 +24,7 @@ export async function DELETE({ params }: paramInterface) {
 	}
 }
 
-export async function PATCH(req: NextRequest, { params }: paramInterface) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const id = (await params).id;
 	await connectToDatabase();
 	try {
