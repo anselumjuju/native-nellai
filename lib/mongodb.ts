@@ -1,32 +1,34 @@
 import mongoose from "mongoose";
 
-declare global {
-	var mongoose: { conn: any, promise: any };
+interface MongooseGlobal {
+	conn: typeof mongoose | null;
+	promise: Promise<typeof mongoose> | null;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mongooseGlobal: MongooseGlobal = (globalThis as any).mongooseGlobal || { conn: null, promise: null };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).mongooseGlobal = mongooseGlobal;
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-
-let cached = global.mongoose;
-
-if (!cached) {
-	cached = global.mongoose = { conn: null, promise: null };
+if (!MONGODB_URI) {
+	throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
 }
 
-
 async function connectToDatabase() {
-	if (cached.conn) return cached.conn;
+	if (mongooseGlobal.conn) return mongooseGlobal.conn;
 
 	if (!MONGODB_URI) {
 		throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
 	}
 
-	if (!cached.promise) {
-		cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => mongoose);
+	if (!mongooseGlobal.promise) {
+		mongooseGlobal.promise = mongoose.connect(MONGODB_URI).then((mongoose) => mongoose);
 	}
 
-	cached.conn = await cached.promise;
-	return cached.conn;
+	mongooseGlobal.conn = await mongooseGlobal.promise;
+	return mongooseGlobal.conn;
 }
 
 export default connectToDatabase;
