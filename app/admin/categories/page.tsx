@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu';
 import CategoriesModal from '../components/categories-modal';
 import { format } from 'date-fns';
+import DeleteButton from '../components/delete-button';
 
 const CategoriesPage = async () => {
   const { categories } = await (await fetch(`${process.env.BASE_URL}/api/categories`)).json();
@@ -46,7 +47,7 @@ const CategoriesPage = async () => {
                           <span>Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <span className='text-destructive'>Delete</span>
+                          <DeleteButton id={category._id} endpoint='category' />
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                     </DropdownMenuContent>

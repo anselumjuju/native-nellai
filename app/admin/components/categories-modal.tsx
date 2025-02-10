@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { addCategory } from '@/lib/serverActions';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -17,6 +18,7 @@ const categorySchema = z.object({
 
 const CategoriesModal = () => {
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const {
     register,
     handleSubmit,
@@ -27,21 +29,14 @@ const CategoriesModal = () => {
   });
 
   const onSubmit = async (data: any) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      await response.json();
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('description', data.description);
+    startTransition(async () => {
+      await addCategory(formData);
       reset();
       setOpen(false);
-      window.location.reload();
-    } catch (error) {
-      console.error('Request failed:', error);
-    }
+    });
   };
 
   return (
@@ -67,7 +62,7 @@ const CategoriesModal = () => {
             {errors.description && <p className='text-red-500 text-sm'>{String(errors.description.message)}</p>}
           </div>
           <DialogFooter>
-            <Button type='submit'>Submit</Button>
+            <Button type='submit'>{isPending ? 'Submitting...' : 'Submit'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
