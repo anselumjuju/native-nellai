@@ -6,7 +6,6 @@ interface Category extends Document {
 	id: string;
 	name: string;
 	description: string;
-	image?: string;
 	slug: string;
 	createdAt: Date;
 	updatedAt: Date;
@@ -20,7 +19,6 @@ const CategorySchema = new Schema<Category>(
 		},
 		name: { type: String, required: true },
 		description: { type: String, required: true },
-		image: { type: String },
 		slug: { type: String, unique: true },
 	},
 	{ timestamps: true }
