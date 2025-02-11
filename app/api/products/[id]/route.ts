@@ -1,5 +1,5 @@
 import connectToDatabase from "@/lib/mongodb";
-import Product from "@/models/Product";
+import Product from "@/db/Product";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

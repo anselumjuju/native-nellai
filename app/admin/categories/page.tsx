@@ -1,13 +1,13 @@
 import { format } from 'date-fns';
 import { Ellipsis } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import DeleteButton from '../components/delete-button';
+import DeleteButton from '../ui/buttons/delete-button';
 import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import UpdateCategoriesModal from './updateCategoriesModal';
-import AddCategoriesModal from './addCategoriesModal';
+import UpdateCategoriesModal from './modals/update';
+import AddCategoriesModal from './modals/add';
 
 const CategoriesPage = async () => {
   const { categories } = await (await fetch(`${process.env.BASE_URL}/api/categories`)).json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
-import Review from "@/models/Review";
+import Review from "@/db/Review";
 
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

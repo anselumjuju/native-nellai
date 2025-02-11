@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
-import Location from "@/models/Location";
+import Location from "@/db/Location";
 
 export async function GET() {
 	await connectToDatabase();

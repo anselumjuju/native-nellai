@@ -1,12 +1,12 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { useEffect, useTransition } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useEffect, useTransition } from 'react';
 import { updateCategory } from '@/lib/serverActions';
 
 const categorySchema = z.object({
@@ -21,7 +21,6 @@ const UpdateCategoriesModal = ({ id, name, description }: { id: string; name: st
     register,
     handleSubmit,
     formState: { errors },
-    reset,
     setValue,
   } = useForm({
     resolver: zodResolver(categorySchema),

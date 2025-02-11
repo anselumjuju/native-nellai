@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
-import Order from "@/models/Order";
+import Order from "@/db/Order";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const id = (await params).id;
