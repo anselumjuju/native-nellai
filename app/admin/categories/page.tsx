@@ -30,8 +30,8 @@ const CategoriesPage = async () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((category: any) => (
-              <TableRow key={category.id}>
+            {categories.map((category: { _id: string; name: string; description: string; slug: string; createdAt: Date }) => (
+              <TableRow key={category._id}>
                 <TableCell className='font-medium'>{category.name}</TableCell>
                 <TableCell>{category.description}</TableCell>
                 <TableCell className='hidden lg:table-cell'>{category.slug}</TableCell>
@@ -47,7 +47,7 @@ const CategoriesPage = async () => {
                       <DropdownMenuContent>
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
-                            <DialogTrigger>
+                            <DialogTrigger className='w-full'>
                               <button className='w-full text-left text-xs'>Update</button>
                             </DialogTrigger>
                           </DropdownMenuItem>

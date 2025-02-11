@@ -55,11 +55,6 @@ export async function updateCategory(id: string, formData: FormData) {
 	revalidatePath('/admin/categories');
 }
 
-/* Locations */
-export async function addLocation(formData: FormData) {
-
-}
-
 export async function deleteLocation(id: string) {
 	await fetch(`${process.env.BASE_URL}/api/locations/${id}`, {
 		method: 'DELETE',

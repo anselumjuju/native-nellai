@@ -16,6 +16,11 @@ const categorySchema = z.object({
   description: z.string().min(5, 'Description must be at least 5 characters'),
 });
 
+interface CategoryFormData {
+  name: string;
+  description: string;
+}
+
 const AddCategoriesModal = () => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -24,11 +29,11 @@ const AddCategoriesModal = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
+  } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: CategoryFormData) => {
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('description', data.description);
