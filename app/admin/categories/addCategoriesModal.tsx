@@ -16,7 +16,7 @@ const categorySchema = z.object({
   description: z.string().min(5, 'Description must be at least 5 characters'),
 });
 
-const CategoriesModal = () => {
+const AddCategoriesModal = () => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const {
@@ -43,7 +43,8 @@ const CategoriesModal = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
         <Button variant={'outline'}>
-          <Plus /> Add Category
+          <Plus className='mr-1 h-4 w-4' />
+          Add Category
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -70,4 +71,4 @@ const CategoriesModal = () => {
   );
 };
 
-export default CategoriesModal;
+export default AddCategoriesModal;

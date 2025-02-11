@@ -20,7 +20,7 @@ const DeleteButton = ({ id, endpoint }: { id: string; endpoint: string }) => {
   };
 
   return (
-    <button className='text-destructive' onClick={() => handleDelete()} disabled={isPending}>
+    <button className='w-full text-left text-destructive' onClick={() => handleDelete()} disabled={isPending}>
       {isPending ? 'Deleting...' : 'Delete'}
     </button>
   );
