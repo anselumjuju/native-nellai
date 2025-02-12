@@ -7,13 +7,13 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 	const id = (await params).id;
 
 	try {
-		if (!id) return NextResponse.json({ error: "User ID is required", status: 400 });
+		if (!id) return NextResponse.json({ error: "User ID is required" });
 		const user = await User.findById(id);
-		if (!user) return NextResponse.json({ error: "User not found", status: 404 });
-		return NextResponse.json({ data: user, message: "User fetched successfully", status: 200 });
+		if (!user) return NextResponse.json({ error: "User not found" });
+		return NextResponse.json({ data: user, message: "User fetched successfully" });
 	} catch (error) {
 		console.error("Error fetching user:", error);
-		return NextResponse.json({ error: "Failed to retrieve user", status: 500 });
+		return NextResponse.json({ error });
 	}
 }
 
@@ -21,13 +21,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 	await connectToDatabase();
 	const id = (await params).id;
 	try {
-		if (!id) return NextResponse.json({ error: "User ID is required", status: 400 });
+		if (!id) return NextResponse.json({ error: "User ID is required" });
 		const deletedUser = await User.findByIdAndDelete(id);
-		if (!deletedUser) return NextResponse.json({ error: "User not found", status: 404 });
-		return NextResponse.json({ data: deletedUser, message: "User deleted successfully", status: 200 });
+		if (!deletedUser) return NextResponse.json({ error: "User not found" });
+		return NextResponse.json({ data: deletedUser, message: "User deleted successfully" });
 	} catch (error) {
 		console.error("Error deleting user:", error);
-		return NextResponse.json({ error: "Failed to delete user", status: 500 });
+		return NextResponse.json({ error });
 	}
 }
 
@@ -35,13 +35,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 	await connectToDatabase();
 	const id = (await params).id;
 	try {
-		if (!id) return NextResponse.json({ error: "User ID is required", status: 400 });
+		if (!id) return NextResponse.json({ error: "User ID is required" });
 		const body = await req.json();
 		const updatedUser = await User.findByIdAndUpdate(id, body, { new: true });
-		if (!updatedUser) return NextResponse.json({ error: "User not found", status: 404 });
-		return NextResponse.json({ data: updatedUser, message: "User updated successfully", status: 200 });
+		if (!updatedUser) return NextResponse.json({ error: "User not found" });
+		return NextResponse.json({ data: updatedUser, message: "User updated successfully" });
 	} catch (error) {
 		console.error("Error updating user:", error);
-		return NextResponse.json({ error: "Failed to update user", status: 500 });
+		return NextResponse.json({ error });
 	}
 }

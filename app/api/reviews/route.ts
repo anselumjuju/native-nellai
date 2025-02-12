@@ -6,10 +6,10 @@ export async function GET() {
 	await connectToDatabase();
 	try {
 		const reviews = await Review.find();
-		return NextResponse.json({ data: reviews, message: "Reviews fetched successfully", status: 200 });
+		return NextResponse.json({ data: reviews, message: "Reviews fetched successfully" });
 	} catch (error) {
 		console.error("Error fetching reviews:", error);
-		return NextResponse.json({ error: "Failed to fetch reviews", status: 500 });
+		return NextResponse.json({ error });
 	}
 }
 
@@ -18,9 +18,9 @@ export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
 		const newReview = await Review.create(body);
-		return NextResponse.json({ data: newReview, message: "Review created successfully", status: 201 });
+		return NextResponse.json({ data: newReview, message: "Review created successfully" });
 	} catch (error) {
 		console.error("Error creating review:", error);
-		return NextResponse.json({ error: "Failed to create review", status: 500 });
+		return NextResponse.json({ error });
 	}
 }
