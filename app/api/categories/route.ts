@@ -6,9 +6,9 @@ export async function GET() {
 	await connectToDatabase();
 	try {
 		const categories = await Category.find();
-		return NextResponse.json({ categories });
+		return NextResponse.json({ data: categories, message: "Categories fetched successfully", status: 200 });
 	} catch (error) {
-		return NextResponse.json({ error });
+		return NextResponse.json({ error: "Failed to fetch categories", status: 500 });
 	}
 }
 
@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
 		const newCategory = await Category.create(body);
-		return NextResponse.json({ data: newCategory });
+		return NextResponse.json({ data: newCategory, message: "Category created successfully", status: 201 });
 	} catch (error) {
-		return NextResponse.json({ error }, { status: 500 });
+		return NextResponse.json({ error: "Failed to create category", status: 400 });
 	}
 }

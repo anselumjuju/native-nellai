@@ -6,9 +6,9 @@ export async function GET() {
 	await connectToDatabase();
 	try {
 		const orders = await Order.find();
-		return NextResponse.json({ orders });
+		return NextResponse.json({ data: orders, message: "Orders fetched successfully", status: 200 });
 	} catch (error) {
-		return NextResponse.json({ error });
+		return NextResponse.json({ error: "Failed to fetch orders", status: 500 });
 	}
 }
 
@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
 		const newOrder = await Order.create(body);
-		return NextResponse.json({ data: newOrder });
+		return NextResponse.json({ data: newOrder, message: "Order created successfully", status: 201 });
 	} catch (error) {
-		return NextResponse.json({ error }, { status: 500 });
+		return NextResponse.json({ error: "Failed to create order", status: 500 });
 	}
 }
