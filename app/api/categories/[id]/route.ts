@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import Category from "@/db/Category";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	await connectToDatabase();
 	const id = (await params).id;
 	if (!id) return NextResponse.json({ error: "Category ID is required" });
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 	}
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	await connectToDatabase();
 	const id = (await params).id;
 	if (!id) return NextResponse.json({ error: "Category ID is required" });
@@ -28,7 +28,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 	}
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	await connectToDatabase();
 	const id = (await params).id;
 	if (!id) return NextResponse.json({ error: "Category ID is required" });
