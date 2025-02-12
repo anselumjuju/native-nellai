@@ -10,7 +10,7 @@ import UpdateCategoriesModal from './modals/update';
 import AddCategoriesModal from './modals/add';
 
 const CategoriesPage = async () => {
-  const { categories } = await (await fetch(`${process.env.BASE_URL}/api/categories`)).json();
+  const { data: categories } = await (await fetch(`${process.env.BASE_URL}/api/categories`)).json();
 
   return (
     <div className='pt-10 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>

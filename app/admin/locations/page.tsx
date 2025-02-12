@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import UpdateLocationModal from './modals/update';
 
 const LocationsPage = async () => {
-  const { locations } = await (await fetch(`${process.env.BASE_URL}/api/locations`)).json();
+  const { data: locations } = await (await fetch(`${process.env.BASE_URL}/api/locations`)).json();
 
   return (
     <div className='pt-10 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
