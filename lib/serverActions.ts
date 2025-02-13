@@ -1,107 +1,44 @@
 'use server';
 
-import { revalidatePath } from "next/cache";
-
-
-/* Categories */
-export async function addCategory(formData: FormData) {
-	const name = formData.get('name') as string;
-	const description = formData.get('description') as string;
-
-	if (!name || !description)
-		throw new Error('All fields are required');
-
-	await fetch(`${process.env.BASE_URL}/api/categories`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			name,
-			description,
-		}),
-	});
-	revalidatePath('/admin/categories');
+interface HandleRequestProps {
+	endpoint: 'categories' | 'locations' | 'orders' | 'products' | 'reviews' | 'users' | string;
+	method?: 'GET' | 'POST' | 'DELETE' | 'PATCH';
+	id?: string;
+	data?: FormData;
 }
 
-export async function deleteCategory(id: string) {
-	await fetch(`${process.env.BASE_URL}/api/categories/${id}`, {
-		method: 'DELETE',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
-	console.log('Category deleted');
-	revalidatePath('/admin/categories');
-}
+export async function handleRequest({ endpoint, method = 'GET', id, data }: HandleRequestProps) {
+	try {
+		const url = `${process.env.BASE_URL}/api/${endpoint}${id && method !== 'POST' ? `/${id}` : ''}`;
 
-export async function updateCategory(id: string, formData: FormData) {
-	const name = formData.get('name') as string;
-	const description = formData.get('description') as string;
+		if ((method === 'PATCH' || method === 'DELETE') && !id) throw new Error("No ID provided");
+		if ((method === 'POST' || method === 'PATCH') && !data) throw new Error("No data provided");
 
-	if (!name || !description)
-		throw new Error('All fields are required');
+		let body: BodyInit | undefined = undefined;
+		let headers: HeadersInit | undefined = undefined;
+		if (method !== 'GET' && method !== 'DELETE') {
+			if (data instanceof FormData) {
+				const jsonObject: Record<string, string> = {};
+				data.forEach((value, key) => {
+					jsonObject[key] = value as string;
+				});
+				body = JSON.stringify(jsonObject);
+				headers = { 'Content-Type': 'application/json' };
+			}
+		}
 
-	await fetch(`${process.env.BASE_URL}/api/categories/${id}`, {
-		method: 'PATCH',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			name,
-			description,
-		}),
-	});
-	revalidatePath('/admin/categories');
-}
+		const res = await fetch(url, {
+			method,
+			headers,
+			body,
+		});
 
-/* Locations */
-export async function addLocation(formData: FormData) {
-	const name = formData.get('name') as string;
-	const image = formData.get('image') as string;
+		if (!res.ok) throw new Error(res.statusText);
+		const resData = await res.json();
+		return resData;
 
-	if (!name || !image)
-		throw new Error('All fields are required');
-
-	await fetch(`${process.env.BASE_URL}/api/locations`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			name,
-			image,
-		}),
-	});
-	revalidatePath('/admin/locations');
-}
-
-export async function deleteLocation(id: string) {
-	await fetch(`${process.env.BASE_URL}/api/locations/${id}`, {
-		method: 'DELETE',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	})
-	revalidatePath('/admin/locations');
-}
-
-export async function updateLocation(id: string, formData: FormData) {
-	const name = formData.get('name') as string;
-	const image = formData.get('image') as string;
-
-	if (!name || !image)
-		throw new Error('All fields are required');
-
-	await fetch(`${process.env.BASE_URL}/api/locations/${id}`, {
-		method: 'PATCH',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			name,
-			image,
-		}),
-	});
-	revalidatePath('/admin/locations');
+	} catch (e) {
+		const errorMsg = e instanceof Error ? e.message : 'Something went wrong';
+		return { status: 500, success: false, message: errorMsg, error: { code: "INTERNAL_SERVER_ERROR", details: errorMsg } };
+	}
 }
