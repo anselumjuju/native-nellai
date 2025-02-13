@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { updateLocation } from '@/lib/serverActions';
+import { handleRequest } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
 
 const locationSchema = z.object({
@@ -45,7 +45,7 @@ const UpdateLocationModal = ({ id, name, image }: { id: string; name: string; im
       const formData = new FormData();
       formData.append('name', data.name);
       formData.append('image', imageUrl);
-      await updateLocation(id, formData);
+      await handleRequest({ endpoint: 'locations', method: 'PATCH', data: formData, id });
     });
   };
 

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { updateCategory } from '@/lib/serverActions';
+import { handleRequest } from '@/lib/serverActions';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -41,7 +41,7 @@ const UpdateCategoriesModal = ({ id, name, description }: { id: string; name: st
     formData.append('name', data.name);
     formData.append('description', data.description);
     startTransition(async () => {
-      await updateCategory(id, formData);
+      await handleRequest({ endpoint: 'categories', method: 'PATCH', data: formData, id });
     });
   };
 

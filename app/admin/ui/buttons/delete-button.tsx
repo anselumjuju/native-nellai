@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteCategory, deleteLocation } from '@/lib/serverActions';
+import { handleRequest } from '@/lib/serverActions';
 import { useTransition } from 'react';
 
 const DeleteButton = ({ id, endpoint }: { id: string; endpoint: string }) => {
@@ -8,14 +8,7 @@ const DeleteButton = ({ id, endpoint }: { id: string; endpoint: string }) => {
 
   const handleDelete = async () => {
     startTransition(async () => {
-      switch (endpoint) {
-        case 'category':
-          await deleteCategory(id);
-          break;
-        case 'location':
-          await deleteLocation(id);
-          break;
-      }
+      await handleRequest({ endpoint, method: 'DELETE', id });
     });
   };
 

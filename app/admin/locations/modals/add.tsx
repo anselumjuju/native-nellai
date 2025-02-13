@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState, useTransition } from 'react';
-import { addLocation } from '@/lib/serverActions';
+import { handleRequest } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
 
 const locationSchema = z.object({
@@ -43,7 +43,7 @@ const AddLocationModal = () => {
       const formData = new FormData();
       formData.append('name', data.name);
       formData.append('image', imageUrl);
-      await addLocation(formData);
+      await handleRequest({ endpoint: 'locations', method: 'POST', data: formData });
       reset();
       setOpen(false);
     });

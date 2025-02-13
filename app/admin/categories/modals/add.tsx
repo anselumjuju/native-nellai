@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState, useTransition } from 'react';
-import { addCategory } from '@/lib/serverActions';
+import { handleRequest } from '@/lib/serverActions';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -38,7 +38,7 @@ const AddCategoriesModal = () => {
     formData.append('name', data.name);
     formData.append('description', data.description);
     startTransition(async () => {
-      await addCategory(formData);
+      await handleRequest({ endpoint: 'categories', method: 'POST', data: formData });
       reset();
       setOpen(false);
     });
