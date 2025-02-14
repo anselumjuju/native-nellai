@@ -1,16 +1,11 @@
 import { format } from 'date-fns';
-import { Ellipsis } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import DeleteButton from '../ui/buttons/delete-button';
-import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import UpdateCategoriesModal from './modals/update';
 import AddCategoriesModal from './modals/add';
+import { handleRequest } from '@/lib/serverActions';
+import ActionsDropDown from './modals/actionsDropdown';
 
 const CategoriesPage = async () => {
-  const { data: categories } = await (await fetch(`${process.env.BASE_URL}/api/categories`)).json();
+  const { data, success, error } = await handleRequest({ endpoint: 'categories' });
 
   return (
     <div className='pt-10 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
@@ -30,41 +25,18 @@ const CategoriesPage = async () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((category: { _id: string; name: string; description: string; slug: string; createdAt: Date }) => (
-              <TableRow key={category._id}>
-                <TableCell className='font-medium'>{category.name}</TableCell>
-                <TableCell>{category.description}</TableCell>
-                <TableCell className='hidden lg:table-cell'>{category.slug}</TableCell>
-                <TableCell className='hidden md:table-cell'>{format(new Date(category.createdAt), 'PP')}</TableCell>
-                <TableCell className='text-right space-x-2 flex items-center justify-end'>
-                  <Dialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size='icon' variant='ghost' className='rounded-full shadow-none' aria-label='Open edit menu'>
-                          <Ellipsis size={16} strokeWidth={2} aria-hidden='true' />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem>
-                            <DialogTrigger className='w-full'>
-                              <button className='w-full text-left text-xs'>Update</button>
-                            </DialogTrigger>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <DeleteButton id={category._id} endpoint='category' />
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <DialogContent>
-                      <DialogHeader>Update Category</DialogHeader>
-                      <UpdateCategoriesModal id={category._id} name={category.name} description={category.description} />
-                    </DialogContent>
-                  </Dialog>
-                </TableCell>
-              </TableRow>
-            ))}
+            {data &&
+              data.map((category: { _id: string; name: string; description: string; slug: string; createdAt: Date }) => (
+                <TableRow key={category._id}>
+                  <TableCell className='font-medium'>{category.name}</TableCell>
+                  <TableCell>{category.description}</TableCell>
+                  <TableCell className='hidden lg:table-cell'>{category.slug}</TableCell>
+                  <TableCell className='hidden md:table-cell'>{format(new Date(category.createdAt), 'PP')}</TableCell>
+                  <TableCell className='text-right space-x-2 flex items-center justify-end'>
+                    <ActionsDropDown {...category} />
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>

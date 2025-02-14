@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { handleRequest } from '@/lib/serverActions';
+import { handleRequest, revalidate } from '@/lib/serverActions';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -19,7 +19,7 @@ interface CategoryFormData {
   description: string;
 }
 
-const UpdateCategoriesModal = ({ id, name, description }: { id: string; name: string; description: string }) => {
+const UpdateCategoriesModal = ({ id, name, description, closeDialog }: { id: string; name: string; description: string; closeDialog: () => void }) => {
   const [isPending, startTransition] = useTransition();
 
   const {
@@ -42,6 +42,8 @@ const UpdateCategoriesModal = ({ id, name, description }: { id: string; name: st
     formData.append('description', data.description);
     startTransition(async () => {
       await handleRequest({ endpoint: 'categories', method: 'PATCH', data: formData, id });
+      revalidate('/admin/categories');
+      closeDialog();
     });
   };
 

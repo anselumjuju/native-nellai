@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState, useTransition } from 'react';
-import { handleRequest } from '@/lib/serverActions';
+import { handleRequest, revalidate } from '@/lib/serverActions';
 
 const categorySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -41,12 +41,13 @@ const AddCategoriesModal = () => {
       await handleRequest({ endpoint: 'categories', method: 'POST', data: formData });
       reset();
       setOpen(false);
+      revalidate('/admin/categories');
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant={'outline'}>
           <Plus className='mr-1 h-4 w-4' />
           Add Category

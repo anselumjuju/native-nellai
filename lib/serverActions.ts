@@ -1,7 +1,9 @@
 'use server';
 
-interface HandleRequestProps {
-	endpoint: 'categories' | 'locations' | 'orders' | 'products' | 'reviews' | 'users' | string;
+import { revalidatePath } from "next/cache";
+
+export interface HandleRequestProps {
+	endpoint: 'categories' | 'locations' | 'orders' | 'products' | 'reviews' | 'users';
 	method?: 'GET' | 'POST' | 'DELETE' | 'PATCH';
 	id?: string;
 	data?: FormData;
@@ -35,10 +37,15 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 
 		if (!res.ok) throw new Error(res.statusText);
 		const resData = await res.json();
+		// revalidatePath(`/admin/${endpoint} + ${(id && (endpoint! == 'orders' || endpoint == 'users' || endpoint == 'products')) ? `/${id}` : ''}`);
 		return resData;
 
 	} catch (e) {
 		const errorMsg = e instanceof Error ? e.message : 'Something went wrong';
 		return { status: 500, success: false, message: errorMsg, error: { code: "INTERNAL_SERVER_ERROR", details: errorMsg } };
 	}
+}
+
+export async function revalidate(url: string) {
+	revalidatePath(url);
 }
