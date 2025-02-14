@@ -5,7 +5,7 @@ import { handleRequest } from '@/lib/serverActions';
 import ActionsDropDown from './modals/actionsDropdown';
 
 const CategoriesPage = async () => {
-  const { data, success, error } = await handleRequest({ endpoint: 'categories' });
+  const { data } = await handleRequest({ endpoint: 'categories' });
 
   return (
     <div className='pt-10 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>

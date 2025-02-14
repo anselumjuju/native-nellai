@@ -8,7 +8,7 @@ const DeleteButton = ({ id, endpoint }: { id: string; endpoint: HandleRequestPro
 
   const handleDelete = async () => {
     startTransition(async () => {
-      const { success, message } = await handleRequest({ endpoint: endpoint, method: 'DELETE', id });
+      await handleRequest({ endpoint: endpoint, method: 'DELETE', id });
       revalidate(`/admin/${endpoint} + ${id && (endpoint! == 'orders' || endpoint == 'users' || endpoint == 'products') ? `/${id}` : ''}`);
     });
   };
