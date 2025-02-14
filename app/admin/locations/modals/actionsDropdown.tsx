@@ -3,13 +3,13 @@
 import { Ellipsis } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenuGroup } from '@radix-ui/react-dropdown-menu';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import DeleteButton from '../../ui/buttons/delete-button';
-import UpdateCategoriesModal from './update';
 import { useState } from 'react';
+import UpdateLocationModal from './update';
 
-const ActionsDropDown = (category: { _id: string; name: string; description: string }) => {
+const ActionsDropDown = (location: { _id: string; name: string; image: string }) => {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -23,19 +23,18 @@ const ActionsDropDown = (category: { _id: string; name: string; description: str
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <DialogTrigger className='w-full'>
-                <button className='w-full text-left text-xs'>Update</button>
+                <button className='w-full text-left text-xs'>Edit</button>
               </DialogTrigger>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <DeleteButton id={category._id} endpoint='categories' />
+              <DeleteButton id={location._id} endpoint='locations' />
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <DialogContent>
         <DialogHeader>Update Category</DialogHeader>
-        <DialogTitle className='sr-only'>{category.name}</DialogTitle>
-        <UpdateCategoriesModal id={category._id} name={category.name} description={category.description} closeDialog={() => setOpen(false)} />
+        <UpdateLocationModal id={location._id} name={location.name} image={location.image} closeDialog={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );

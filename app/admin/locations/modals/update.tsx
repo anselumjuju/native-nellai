@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { handleRequest } from '@/lib/serverActions';
+import { handleRequest, revalidate } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
 
 const locationSchema = z.object({
@@ -20,7 +20,7 @@ interface LocationFormData {
   image?: File;
 }
 
-const UpdateLocationModal = ({ id, name, image }: { id: string; name: string; image: string }) => {
+const UpdateLocationModal = ({ id, name, image, closeDialog }: { id: string; name: string; image: string; closeDialog: () => void }) => {
   const [isPending, startTransition] = useTransition();
 
   const {
@@ -46,6 +46,8 @@ const UpdateLocationModal = ({ id, name, image }: { id: string; name: string; im
       formData.append('name', data.name);
       formData.append('image', imageUrl);
       await handleRequest({ endpoint: 'locations', method: 'PATCH', data: formData, id });
+      revalidate('/admin/locations');
+      closeDialog();
     });
   };
 

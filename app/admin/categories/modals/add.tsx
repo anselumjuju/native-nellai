@@ -54,9 +54,7 @@ const AddCategoriesModal = () => {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add New Category</DialogTitle>
-        </DialogHeader>
+        <DialogTitle>Add New Category</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <div>
             <Label htmlFor='name'>Name</Label>

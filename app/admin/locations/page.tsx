@@ -1,14 +1,9 @@
-import { Dialog, DialogContent, DialogTrigger, DialogHeader } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Ellipsis } from 'lucide-react';
-import DeleteButton from '../ui/buttons/delete-button';
 import { format } from 'date-fns';
 import AddLocationModal from './modals/add';
 import Image from 'next/image';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import UpdateLocationModal from './modals/update';
+import ActionsDropDown from './modals/actionsDropdown';
 
 const LocationsPage = async () => {
   const { data: locations } = await (await fetch(`${process.env.BASE_URL}/api/locations`)).json();
@@ -60,31 +55,7 @@ const LocationsPage = async () => {
                 <TableCell className='hidden lg:table-cell'>{location.slug}</TableCell>
                 <TableCell className='hidden md:table-cell'>{format(new Date(location.createdAt), 'PP')}</TableCell>
                 <TableCell className='text-right space-x-2 flex items-center justify-end'>
-                  <Dialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size='icon' variant='ghost' className='rounded-full shadow-none' aria-label='Open edit menu'>
-                          <Ellipsis size={16} strokeWidth={2} aria-hidden='true' />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem>
-                            <DialogTrigger className='w-full'>
-                              <button className='w-full text-left text-xs'>Edit</button>
-                            </DialogTrigger>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <DeleteButton id={location._id} endpoint='location' />
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <DialogContent>
-                      <DialogHeader>Update Category</DialogHeader>
-                      <UpdateLocationModal id={location._id} name={location.name} image={location.image} />
-                    </DialogContent>
-                  </Dialog>
+                  <ActionsDropDown {...location} />
                 </TableCell>
               </TableRow>
             ))}
