@@ -4,10 +4,8 @@ interface MongooseGlobal {
 	conn: typeof mongoose | null;
 	promise: Promise<typeof mongoose> | null;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mongooseGlobal: MongooseGlobal = (globalThis as any).mongooseGlobal || { conn: null, promise: null };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).mongooseGlobal = mongooseGlobal;
 
 const MONGODB_URI = process.env.MONGODB_URI;
