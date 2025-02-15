@@ -7,10 +7,11 @@ import DeleteButton from '../ui/buttons/delete-button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Image from 'next/image';
 import { handleRequest } from '@/lib/serverActions';
-import { format } from 'date-fns';
 
 const ProductsPage = async () => {
   const { data, success } = await handleRequest({ endpoint: 'products' });
+  const { data: categories } = await handleRequest({ endpoint: 'categories' });
+  const { data: locations } = await handleRequest({ endpoint: 'locations' });
 
   if (!success) {
     return (
@@ -32,8 +33,11 @@ const ProductsPage = async () => {
     );
   }
 
+  const categoryName = categories.find((category: { _id: string }) => category._id === data[0].categoryId)?.name || 'N/A';
+  const locationName = locations.find((location: { _id: string }) => location._id === data[0].locationId)?.name || 'N/A';
+
   return (
-    <div className='px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
+    <div className='pt-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
       <div className='w-full max-w-screen-xl flex items-center justify-between'>
         <h1 className='text-lg font-semibold'>Categories</h1>
         <Link href='/admin/products/new'>
@@ -57,34 +61,37 @@ const ProductsPage = async () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((product: { _id: string; name: string; image: string; slug: string; createdAt: Date }) => (
+            {data.map((product: { _id: string; name: string; mainImage: string; originalPrice: number; discountPrice: number; createdAt: string }) => (
               <TableRow key={product._id}>
                 <TableCell>
                   <TooltipProvider delayDuration={0}>
                     <Tooltip>
                       <TooltipTrigger>
                         <Image
-                          src={product.image}
+                          src={product.mainImage || 'https://placehold.co/400/png'}
                           alt={product.name}
                           width={50}
                           height={50}
                           className='h-12 aspect-square rounded-sm object-cover'
                           unoptimized
                           placeholder='blur'
-                          blurDataURL={product.image}
+                          blurDataURL={product.mainImage}
                         />
                       </TooltipTrigger>
                       <TooltipContent className='p-1 bg-secondary'>
                         <div className='w-52 aspect-square rounded-md'>
-                          <Image className='w-full h-full object-cover' src={product.image} width={120} height={120} alt='Content image' unoptimized />
+                          <Image className='w-full h-full object-cover' src={product.mainImage} width={120} height={120} alt='Content image' unoptimized />
                         </div>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </TableCell>
                 <TableCell className='font-medium'>{product.name}</TableCell>
-                <TableCell className='hidden lg:table-cell'>{product.slug}</TableCell>
-                <TableCell className='hidden md:table-cell'>{format(new Date(product.createdAt), 'PP')}</TableCell>
+                <TableCell className='hidden lg:table-cell'>{categoryName}</TableCell>
+                <TableCell className='hidden lg:table-cell'>{locationName}</TableCell>
+                <TableCell className='font-medium'>{product.originalPrice}</TableCell>
+                <TableCell className='font-medium'>{product.discountPrice}</TableCell>
+
                 <TableCell className='text-right space-x-2 flex items-center justify-end'>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -96,7 +103,7 @@ const ProductsPage = async () => {
                       <DropdownMenuGroup>
                         <DropdownMenuItem>
                           <Link href={`/admin/products/${product._id}`}>
-                            <Button className='w-full text-left text-xs'>Edit</Button>
+                            <button className='w-full text-left text-xs'>Edit</button>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>

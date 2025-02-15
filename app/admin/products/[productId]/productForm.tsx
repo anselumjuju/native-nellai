@@ -11,26 +11,37 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { handleRequest } from '@/lib/serverActions';
+import { uploadImage } from '@/lib/uploadImage';
 
-export const formSchema = z.object({
-  productName: z.string().min(1, 'Product Name is required'),
-  caption: z.string().min(1, 'Short Caption is required'),
-  mainImage: z.any().refine((file) => file?.length > 0, 'Main Image is required'),
-  productDescription: z.string().min(1, 'Product Description is required'),
-  productAbout: z.string().min(1, 'About section is required'),
-  productQuantity: z.enum(['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'], {
-    errorMap: () => ({ message: 'Invalid quantity selected' }),
-  }),
-  productStock: z.enum(['available', 'unavailable'], {
-    errorMap: () => ({ message: 'Invalid stock status' }),
-  }),
-  productCategory: z.string().min(1, 'Category is required'),
-  productLocation: z.string().min(1, 'Location is required'),
-  originalPrice: z.preprocess((val) => Number(val), z.number().positive('Original Price must be greater than zero')),
-  discountPrice: z.preprocess((val) => Number(val), z.number().nonnegative('Discount Price cannot be negative')).optional(),
-  isBanner: z.boolean().optional(),
-  bannerImage: z.any().optional(),
-});
+export const formSchema = z
+  .object({
+    name: z.string().min(1, 'Product Name is required'),
+    caption: z.string().min(1, 'Short Caption is required'),
+    mainImage: z.any().refine((file) => file?.length > 0, 'Main Image is required'),
+    description: z.string().min(1, 'Product Description is required'),
+    about: z.string().min(1, 'About section is required'),
+    quantity: z.enum(['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'], {
+      errorMap: () => ({ message: 'Invalid quantity selected' }),
+    }),
+    stock: z.enum(['available', 'unavailable'], {
+      errorMap: () => ({ message: 'Invalid stock status' }),
+    }),
+    categoryId: z.string().min(1, 'Category is required'),
+    locationId: z.string().min(1, 'Location is required'),
+    originalPrice: z.preprocess((val) => Number(val), z.number().positive('Original Price must be greater than zero')),
+    discountPrice: z.preprocess((val) => Number(val), z.number().nonnegative('Discount Price cannot be negative')).optional(),
+    isBanner: z.boolean().optional(),
+    bannerImage: z.any().optional(),
+  })
+  .refine(
+    (data) => {
+      return !data.isBanner || (data.isBanner && data.bannerImage);
+    },
+    {
+      message: 'Banner image is required.',
+      path: ['bannerImage'],
+    }
+  );
 
 interface ProductFormProps {
   product?: z.infer<typeof formSchema>;
@@ -40,38 +51,72 @@ interface ProductFormProps {
 const ProductForm = ({ product, productId }: ProductFormProps) => {
   const [locations, setLocations] = useState<{ _id: string; name: string }[]>([]);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [locationId, setLocationId] = useState<string>('');
 
   useEffect(() => {
     (async () => {
       const { data: categories } = await handleRequest({ endpoint: 'categories' });
       const { data: locations } = await handleRequest({ endpoint: 'locations' });
-
       setCategories(categories);
       setLocations(locations);
+      setCategoryId(categories.find((category: { _id: string }) => category._id === product?.categoryId)?._id || 'N/A');
+      setLocationId(locations.find((location: { _id: string }) => location._id === product?.locationId)?._id || 'N/A');
     })();
   }, []);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      productName: 'Test',
-      caption: 'Test Caption',
+      name: product?.name || '',
+      caption: product?.caption || '',
       mainImage: null,
-      productDescription: 'Test Description',
-      productAbout: 'Test About',
-      productQuantity: '1/2kg',
-      productStock: 'available',
-      productCategory: '67aa3f16dd8959266cedc17f',
-      productLocation: '67ab1196bb2c6d21d3051e51',
-      originalPrice: '235',
-      discountPrice: '',
-      isBanner: false,
+      description: product?.description || '',
+      about: product?.about || '',
+      quantity: product?.quantity || '',
+      stock: product?.stock || '',
+      categoryId: '',
+      locationId: '',
+      originalPrice: product?.originalPrice || '',
+      discountPrice: product?.discountPrice || '',
+      isBanner: product?.isBanner || false,
       bannerImage: null,
     },
   });
 
   const handleSubmit = async (data: any) => {
-    console.log(product);
-    console.log(data);
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('mainImage', await uploadImage(data.mainImage[0]));
+    formData.append('caption', data.caption);
+    formData.append('description', data.description);
+    formData.append('about', data.about);
+    formData.append('quantity', data.quantity);
+    formData.append('stock', data.stock);
+    formData.append('categoryId', data.categoryId);
+    formData.append('locationId', data.locationId);
+    formData.append('originalPrice', data.originalPrice.toString());
+    formData.append('discountPrice', data.discountPrice.toString());
+    formData.append('isBanner', data.isBanner.toString());
+    if (data.bannerImage) formData.append('bannerImage', await uploadImage(data.bannerImage[0]));
+
+    if (!productId) {
+      console.log('Adding new product');
+      const { success } = await handleRequest({ endpoint: 'products', method: 'POST', data: formData });
+
+      if (success) {
+        form.reset();
+        window.location.href = '/admin/products';
+      }
+    } else {
+      console.log('Updating product');
+      const { success } = await handleRequest({ endpoint: 'products', method: 'PATCH', data: formData, id: productId });
+
+      if (success) {
+        form.reset();
+        window.location.href = '/admin/products';
+      }
+    }
   };
 
   return (
@@ -82,8 +127,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           <Label className='text-sm font-semibold'>
             Product Name <span className='text-destructive'>*</span>
           </Label>
-          <Input {...form.register('productName')} placeholder='Product Name' type='text' />
-          {form.formState.errors.productName && <p className='text-xs text-red-700'>{form.formState.errors.productName.message}</p>}
+          <Input {...form.register('name')} placeholder='Product Name' type='text' />
+          {form.formState.errors.name && <p className='text-xs text-red-700'>{form.formState.errors.name.message}</p>}
         </div>
 
         <div className='space-y-3'>
@@ -109,8 +154,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
         <Label>
           Product Description <span className='text-destructive'>*</span>
         </Label>
-        <Input {...form.register('productDescription')} placeholder='Product Description' type='text' />
-        {form.formState.errors.productDescription && <p className='text-xs text-red-700'>{form.formState.errors.productDescription.message}</p>}
+        <Input {...form.register('description')} placeholder='Product Description' type='text' />
+        {form.formState.errors.description && <p className='text-xs text-red-700'>{form.formState.errors.description.message}</p>}
       </div>
 
       {/* About */}
@@ -118,8 +163,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
         <Label className='text-sm font-semibold'>
           About <span className='text-destructive text-base'>*</span>
         </Label>
-        <Textarea {...form.register('productAbout')} id='productAbout' placeholder='Explain about the product' className='max-h-52 resize-y' />
-        {form.formState.errors.productAbout && <p className='text-xs text-red-700'>{form.formState.errors.productAbout.message}</p>}
+        <Textarea {...form.register('about')} id='about' placeholder='Explain about the product' className='max-h-52 resize-y' />
+        {form.formState.errors.about && <p className='text-xs text-red-700'>{form.formState.errors.about.message}</p>}
       </div>
 
       {/* Quantity Selection */}
@@ -130,7 +175,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           </Label>
           <Controller
             control={form.control}
-            name='productQuantity'
+            name='quantity'
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
@@ -146,7 +191,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
               </Select>
             )}
           />
-          {form.formState.errors.productQuantity && <p className='text-xs text-red-700'>{form.formState.errors.productQuantity.message}</p>}
+          {form.formState.errors.quantity && <p className='text-xs text-red-700'>{form.formState.errors.quantity.message}</p>}
         </div>
         <div className='space-y-3'>
           <Label>
@@ -154,7 +199,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           </Label>
           <Controller
             control={form.control}
-            name='productStock'
+            name='stock'
             render={({ field }) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
@@ -170,7 +215,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
               </Select>
             )}
           />
-          {form.formState.errors.productStock && <p className='text-xs text-red-700'>{form.formState.errors.productStock.message}</p>}
+          {form.formState.errors.stock && <p className='text-xs text-red-700'>{form.formState.errors.stock.message}</p>}
         </div>
       </div>
 
@@ -182,9 +227,9 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           </Label>
           <Controller
             control={form.control}
-            name='productCategory'
+            name='categoryId'
             render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={categoryId}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Category' />
                 </SelectTrigger>
@@ -198,7 +243,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
               </Select>
             )}
           />
-          {form.formState.errors.productCategory && <p className='text-xs text-red-700'>{form.formState.errors.productCategory.message}</p>}
+          {form.formState.errors.categoryId && <p className='text-xs text-red-700'>{form.formState.errors.categoryId.message}</p>}
         </div>
         <div className='space-y-3'>
           <Label>
@@ -206,9 +251,9 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           </Label>
           <Controller
             control={form.control}
-            name='productLocation'
+            name='locationId'
             render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={locationId}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Location' />
                 </SelectTrigger>
@@ -222,7 +267,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
               </Select>
             )}
           />
-          {form.formState.errors.productLocation && <p className='text-xs text-red-700'>{form.formState.errors.productLocation.message}</p>}
+          {form.formState.errors.locationId && <p className='text-xs text-red-700'>{form.formState.errors.locationId.message}</p>}
         </div>
       </div>
 
@@ -252,7 +297,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
               id='isBanner'
               className='order-1 h-4 w-6 after:absolute after:inset-0 [&_span]:size-3 [&_span]:data-[state=checked]:translate-x-2 rtl:[&_span]:data-[state=checked]:-translate-x-2'
               aria-describedby={'isBanner'}
-              {...form.register('isBanner')}
+              checked={form.watch('isBanner')}
+              onCheckedChange={(checked) => form.setValue('isBanner', checked)}
             />
             <Label htmlFor='isBanner'>Feature as Banner</Label>
           </div>
