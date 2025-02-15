@@ -1,56 +1,58 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { nanoid } from "nanoid";
 import Product from "./Product";
+import User from "./User";
 
-interface ReviewEntry {
-	id: string;
-	userId: string;
+export interface IReview extends Document {
+	productId: string;
 	rating: number;
 	comment: string;
-	createdAt: Date;
-}
-
-interface Review extends Document {
-	id: string;
-	productId: string;
-	reviews: ReviewEntry[];
+	userId: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
-const ReviewSchema = new Schema<Review>(
+const ReviewSchema = new Schema<IReview>(
 	{
-		id: {
-			type: String,
-			default: () => nanoid(),
-		},
-		productId: { type: String, ref: "Product", required: true },
-		reviews: [
-			{
-				id: { type: String, default: () => nanoid() },
-				userId: { type: String, ref: "User", required: true },
-				rating: { type: Number, required: true, min: 1, max: 5 },
-				comment: { type: String, required: true },
-				createdAt: { type: Date, default: Date.now },
-			},
-		],
+		productId: { type: Schema.Types.String, ref: "Product", required: true },
+		rating: { type: Number, required: true, min: 1, max: 5 },
+		comment: { type: String, required: true },
+		userId: { type: Schema.Types.String, ref: "User", required: true },
 	},
 	{ timestamps: true }
 );
 
 ReviewSchema.pre("save", async function (next) {
-	const productExists = await Product.findById(this.productId);
-	if (!productExists) {
-		throw new Error("Invalid productId: Product does not exist");
-	}
-	for (const review of this.reviews) {
-		const userExists = await mongoose.model("User").findById(review.userId);
-		if (!userExists) {
-			throw new Error("Invalid userId: User does not exist");
-		}
-	}
+	const product = await Product.findById(this.productId);
+	if (!product) throw new Error("Invalid productId: Product does not exist");
+
+	const user = await User.findById(this.userId);
+	if (!user) throw new Error("Invalid userId: User does not exist");
 
 	next();
 });
 
-export default mongoose.models.Review || mongoose.model<Review>("Review", ReviewSchema);
+ReviewSchema.post("save", async function (doc, next) {
+	try {
+		await Product.findByIdAndUpdate(doc.productId, {
+			$push: { reviews: doc._id }
+		});
+		next();
+	} catch (error) {
+		throw new Error("Invalid productId: Product does not exist");
+	}
+});
+
+ReviewSchema.post("findOneAndDelete", async function (doc, next) {
+	try {
+		if (doc) {
+			await Product.findByIdAndUpdate(doc.productId, {
+				$pull: { reviews: doc._id }
+			});
+		}
+		next();
+	} catch (error) {
+		throw new Error("Invalid productId: Product does not exist");
+	}
+});
+
+export default mongoose.models.Review || mongoose.model<IReview>("Review", ReviewSchema);

@@ -1,18 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { nanoid } from "nanoid";
 import Product from "./Product";
 import User from "./User";
 
-interface OrderItem {
-	id: string;
-	productId: string;
-	quantity: number;
-}
-
-interface Order extends Document {
-	id: string;
+export interface IOrder extends Document {
 	userId: string;
-	items: OrderItem[];
+	items: {
+		productId: string;
+		quantity: number;
+	}[];
 	totalPrice: number;
 	status: "pending" | "shipped" | "delivered" | "cancelled";
 	paymentStatus: "paid" | "pending" | "failed";
@@ -22,17 +17,12 @@ interface Order extends Document {
 	updatedAt: Date;
 }
 
-const OrderSchema = new Schema<Order>(
+const OrderSchema = new Schema<IOrder>(
 	{
-		id: {
-			type: String,
-			default: () => nanoid(),
-		},
 		userId: { type: String, ref: "User", required: true },
 		items: [
 			{
-				id: { type: String, default: () => nanoid() },
-				productId: { type: String, ref: "Product", required: true },
+				productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
 				quantity: { type: Number, required: true, min: 1 },
 			},
 		],
@@ -54,20 +44,23 @@ const OrderSchema = new Schema<Order>(
 );
 
 OrderSchema.pre("save", async function (next) {
-
 	const userExists = await User.findById(this.userId);
-	if (!userExists) {
-		throw new Error("Invalid userId: User does not exist");
-	}
-
+	if (!userExists) throw new Error("Invalid userId: User does not exist");
+	let total = 0;
 	for (const item of this.items) {
-		const productExists = await Product.findById(item.productId);
-		if (!productExists) {
+		const product = await Product.findById(item.productId);
+		if (!product) {
 			throw new Error(`Invalid productId: Product with ID ${item.productId} does not exist`);
 		}
+		if (product.stock === 'unavailable') throw new Error(`Product with ID ${item.productId} is unavailable`);
+		const price = product.discountPrice > 0 ? product.discountPrice : product.originalPrice;
+		total += price * item.quantity;
 	}
-
+	this.totalPrice = total;
+	if (this.transactionId && this.paymentStatus !== "paid") {
+		throw new Error("Transaction ID should only be set if payment is marked as 'paid'.");
+	}
 	next();
 });
 
-export default mongoose.models.Order || mongoose.model<Order>("Order", OrderSchema);
+export default mongoose.models.Order || mongoose.model<IOrder>("Order", OrderSchema);

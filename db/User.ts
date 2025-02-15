@@ -1,8 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { nanoid } from "nanoid";
 
-interface User extends Document {
-	id: string;
+export interface IUser extends Document {
 	email: string;
 	password?: string;
 	name: string;
@@ -28,12 +26,8 @@ interface User extends Document {
 	updatedAt: Date;
 }
 
-const UserSchema = new Schema<User>(
+const UserSchema = new Schema<IUser>(
 	{
-		id: {
-			type: String,
-			default: () => nanoid(),
-		},
 		email: { type: String, required: true, unique: true },
 		password: { type: String },
 		name: { type: String, required: true },
@@ -89,4 +83,4 @@ UserSchema.pre("save", async function (next) {
 	next();
 });
 
-export default mongoose.models.User || mongoose.model<User>("User", UserSchema);
+export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);

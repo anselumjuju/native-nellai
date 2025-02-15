@@ -1,24 +1,18 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { nanoid } from "nanoid";
+import mongoose, { Schema, Document, UpdateQuery } from "mongoose";
 import slugify from "slugify";
 
-interface Location extends Document {
-	id: string;
+export interface ILocation extends Document {
 	name: string;
-	image?: string;
+	image: string;
 	slug: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
-const LocationSchema = new Schema<Location>(
+const LocationSchema = new Schema<ILocation>(
 	{
-		id: {
-			type: String,
-			default: () => nanoid(),
-		},
 		name: { type: String, required: true },
-		image: { type: String },
+		image: { type: String, required: true },
 		slug: { type: String, unique: true },
 	},
 	{ timestamps: true }
@@ -31,4 +25,11 @@ LocationSchema.pre("save", function (next) {
 	next();
 });
 
-export default mongoose.models.Location || mongoose.model<Location>("Location", LocationSchema);
+LocationSchema.pre("findOneAndUpdate", async function (next) {
+	const update: UpdateQuery<ILocation> | null = this.getUpdate();
+	if (!update) return next();
+	if (update.name) update.slug = slugify(update.name, { lower: true, strict: true });
+	next();
+});
+
+export default mongoose.models.Location || mongoose.model<ILocation>("Location", LocationSchema);

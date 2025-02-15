@@ -1,9 +1,7 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { nanoid } from "nanoid";
+import mongoose, { Schema, Document, Model, UpdateQuery } from "mongoose";
 import slugify from "slugify";
 
-interface Category extends Document {
-	id: string;
+export interface ICategory extends Document {
 	name: string;
 	description: string;
 	slug: string;
@@ -11,24 +9,29 @@ interface Category extends Document {
 	updatedAt: Date;
 }
 
-const CategorySchema = new Schema<Category>(
+const CategorySchema = new Schema<ICategory>(
 	{
-		id: {
-			type: String,
-			default: () => nanoid(),
-		},
-		name: { type: String, required: true },
+		name: { type: String, required: true, trim: true },
 		description: { type: String, required: true },
 		slug: { type: String, unique: true },
 	},
 	{ timestamps: true }
 );
 
-CategorySchema.pre("save", function (next) {
-	if (!this.slug) {
+CategorySchema.pre<ICategory>("save", function (next) {
+	if (!this.slug || this.isModified("name")) {
 		this.slug = slugify(this.name, { lower: true, strict: true });
 	}
 	next();
 });
 
-export default mongoose.models.Category || mongoose.model<Category>("Category", CategorySchema);
+CategorySchema.pre("findOneAndUpdate", function (next) {
+	const update: UpdateQuery<ICategory> | null = this.getUpdate();
+	if (!update) return next();
+	if (update.name) update.slug = slugify(update.name, { lower: true, strict: true });
+	next();
+});
+
+const Category: Model<ICategory> = mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema);
+
+export default Category;
