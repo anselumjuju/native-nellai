@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from 
 import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState, useTransition } from 'react';
+import { ReactNode, useState, useTransition } from 'react';
 import { handleRequest, revalidate } from '@/lib/serverActions';
 
 const categorySchema = z.object({
@@ -21,7 +21,7 @@ interface CategoryFormData {
   description: string;
 }
 
-const AddCategoriesModal = () => {
+const AddCategoriesModal = ({ triggerButton }: { triggerButton?: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const {
@@ -48,10 +48,12 @@ const AddCategoriesModal = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={'outline'}>
-          <Plus className='mr-1 h-4 w-4' />
-          Add Category
-        </Button>
+        {triggerButton || (
+          <Button variant='outline'>
+            <Plus className='mr-1 h-4 w-4' />
+            Add Category
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Add New Category</DialogTitle>

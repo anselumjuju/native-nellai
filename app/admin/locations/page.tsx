@@ -1,15 +1,41 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
-import AddLocationModal from './modals/add';
+import AddLocationModal from './ui/add';
 import Image from 'next/image';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import ActionsDropDown from './modals/actionsDropdown';
+import ActionsDropDown from './ui/actionsDropdown';
+import { Button } from '@/components/ui/button';
+import { handleRequest } from '@/lib/serverActions';
 
 const LocationsPage = async () => {
-  const { data: locations } = await (await fetch(`${process.env.BASE_URL}/api/locations`)).json();
+  const { data, success } = await handleRequest({ endpoint: 'locations' });
+
+  if (!success) {
+    return (
+      <div className='w-full h-full flex items-center justify-center text-center'>
+        <p>Something went wrong</p>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className='w-full h-full flex flex-col items-center justify-center text-center gap-6'>
+        <h1 className='text-5xl font-bold'>There is nothing here!</h1>
+        <p className='w-[50ch] text-sm font-normal text-muted-foreground'>Your location list is empty! Add your first location and start managing them easily.</p>
+        <AddLocationModal
+          triggerButton={
+            <Button variant='default' className='mt-0'>
+              New Location
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className='pt-10 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
+    <div className='pt-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
       <div className='w-full max-w-screen-xl flex items-center justify-between'>
         <h1 className='text-lg font-semibold'>Categories</h1>
         <AddLocationModal />
@@ -26,7 +52,7 @@ const LocationsPage = async () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {locations.map((location: { _id: string; name: string; image: string; slug: string; createdAt: Date }) => (
+            {data.map((location: { _id: string; name: string; image: string; slug: string; createdAt: Date }) => (
               <TableRow key={location._id}>
                 <TableCell>
                   <TooltipProvider delayDuration={0}>

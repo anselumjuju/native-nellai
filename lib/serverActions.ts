@@ -37,7 +37,6 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 
 		if (!res.ok) throw new Error(res.statusText);
 		const resData = await res.json();
-		// revalidatePath(`/admin/${endpoint} + ${(id && (endpoint! == 'orders' || endpoint == 'users' || endpoint == 'products')) ? `/${id}` : ''}`);
 		return resData;
 
 	} catch (e) {

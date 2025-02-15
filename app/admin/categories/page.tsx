@@ -1,14 +1,39 @@
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import AddCategoriesModal from './modals/add';
+import AddCategoriesModal from './ui/add';
 import { handleRequest } from '@/lib/serverActions';
-import ActionsDropDown from './modals/actionsDropdown';
+import ActionsDropDown from './ui/actionsDropdown';
+import { Button } from '@/components/ui/button';
 
 const CategoriesPage = async () => {
-  const { data } = await handleRequest({ endpoint: 'categories' });
+  const { data, success } = await handleRequest({ endpoint: 'categories' });
+
+  if (!success) {
+    return (
+      <div className='w-full h-full flex items-center justify-center text-center'>
+        <p>Something went wrong</p>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className='w-full h-full flex flex-col items-center justify-center text-center gap-6'>
+        <h1 className='text-5xl font-bold'>No Categories found!</h1>
+        <p className='w-[50ch] text-sm font-normal text-muted-foreground'>Looks like there are no categories yet. But don't worry, you can create one in just a click!</p>
+        <AddCategoriesModal
+          triggerButton={
+            <Button variant='default' className='mt-0'>
+              New Category
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className='pt-10 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
+    <div className='pt-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
       <div className='w-full max-w-screen-xl flex items-center justify-between'>
         <h1 className='text-lg font-semibold'>Categories</h1>
         <AddCategoriesModal />
@@ -21,7 +46,7 @@ const CategoriesPage = async () => {
               <TableHead>Description</TableHead>
               <TableHead className='hidden lg:table-cell'>Slug</TableHead>
               <TableHead className='hidden md:table-cell'>Created At</TableHead>
-              <TableHead className='text-right'>Actions</TableHead>
+              <TableHead className='text-right'></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

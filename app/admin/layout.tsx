@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
         <SiteHeader />
         <div className='flex flex-1'>
           <AppSidebar />
-          <SidebarInset>{children}</SidebarInset>
+          <SidebarInset className='!min-h-[calc(100svh-var(--header-height))]'>{children}</SidebarInset>
         </div>
       </SidebarProvider>
     </div>

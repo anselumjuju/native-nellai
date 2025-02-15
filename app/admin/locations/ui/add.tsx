@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState, useTransition } from 'react';
+import { ReactNode, useState, useTransition } from 'react';
 import { handleRequest, revalidate } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
 
@@ -24,7 +24,7 @@ interface LocationFormData {
   image: File;
 }
 
-const AddLocationModal = () => {
+const AddLocationModal = ({ triggerButton }: { triggerButton?: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const {
@@ -53,10 +53,12 @@ const AddLocationModal = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Button variant={'outline'}>
-          <Plus className='mr-1 h-4 w-4' />
-          Add Location
-        </Button>
+        {triggerButton || (
+          <Button variant={'outline'}>
+            <Plus className='mr-1 h-4 w-4' />
+            Add Location
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

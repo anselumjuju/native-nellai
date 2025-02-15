@@ -10,16 +10,16 @@ interface Product extends Document {
 	slug: string;
 	images: {
 		main: string;
-		banner: string;
-		others: string[];
+		banner?: string;
+		others?: string[];
 	};
 	caption: string;
 	description: string;
 	about: string;
-	quantity: number;
+	quantity: string;
 	originalPrice: number;
 	discountPrice: number;
-	categoryId: string;
+	categoryId?: string[];
 	locationId: string;
 	isBanner: boolean;
 	createdAt: Date;
@@ -36,16 +36,16 @@ const ProductSchema = new Schema<Product>(
 		slug: { type: String, unique: true },
 		images: {
 			main: { type: String, required: true },
-			banner: { type: String, required: true },
-			others: { type: [String], required: true },
+			banner: { type: String },
+			others: { type: [String] },
 		},
 		caption: { type: String, required: true },
 		description: { type: String, required: true },
 		about: { type: String, required: true },
-		quantity: { type: Number, required: true, min: 0 },
+		quantity: { type: String, required: true, min: 0 },
 		originalPrice: { type: Number, required: true, min: 0 },
 		discountPrice: { type: Number, required: true, min: 0 },
-		categoryId: { type: String, ref: "Category", required: true },
+		categoryId: { type: [String], ref: "Category", },
 		locationId: { type: String, ref: "Location", required: true },
 		isBanner: { type: Boolean, default: false },
 	},

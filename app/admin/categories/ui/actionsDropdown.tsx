@@ -23,7 +23,7 @@ const ActionsDropDown = (category: { _id: string; name: string; description: str
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <DialogTrigger className='w-full'>
-                <button className='w-full text-left text-xs'>Update</button>
+                <button className='w-full text-left text-xs'>Edit</button>
               </DialogTrigger>
             </DropdownMenuItem>
             <DropdownMenuItem>
