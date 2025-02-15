@@ -21,7 +21,7 @@ export const formSchema = z.object({
   productQuantity: z.enum(['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'], {
     errorMap: () => ({ message: 'Invalid quantity selected' }),
   }),
-  productStock: z.enum(['Available', 'Unavailable'], {
+  productStock: z.enum(['available', 'unavailable'], {
     errorMap: () => ({ message: 'Invalid stock status' }),
   }),
   productCategory: z.string().min(1, 'Category is required'),
@@ -53,23 +53,26 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      productName: '',
-      caption: '',
+      productName: 'Test',
+      caption: 'Test Caption',
       mainImage: null,
-      productDescription: '',
-      productAbout: '',
-      productQuantity: '',
-      productStock: '',
-      productCategory: '',
-      productLocation: '',
-      originalPrice: '',
+      productDescription: 'Test Description',
+      productAbout: 'Test About',
+      productQuantity: '1/2kg',
+      productStock: 'available',
+      productCategory: '67aa3f16dd8959266cedc17f',
+      productLocation: '67ab1196bb2c6d21d3051e51',
+      originalPrice: '235',
       discountPrice: '',
       isBanner: false,
       bannerImage: null,
     },
   });
 
-  const handleSubmit = (data: any) => {};
+  const handleSubmit = async (data: any) => {
+    console.log(product);
+    console.log(data);
+  };
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className='w-full flex flex-col gap-8'>
@@ -158,8 +161,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
                   <SelectValue placeholder='Select Stock' />
                 </SelectTrigger>
                 <SelectContent>
-                  {['Available', 'Unavailable'].map((stock) => (
-                    <SelectItem key={stock} value={stock}>
+                  {['available', 'unavailable'].map((stock) => (
+                    <SelectItem key={stock} value={stock} className='capitalize placeholder:capitalize'>
                       {stock}
                     </SelectItem>
                   ))}

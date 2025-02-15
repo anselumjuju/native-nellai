@@ -6,20 +6,18 @@ import Location from "./Location";
 export interface IProduct extends Document {
 	name: string;
 	slug: string;
-	images: {
-		main: string;
-		banner?: string;
-	};
+	mainImage: string;
 	caption: string;
 	description: string;
 	about: string;
-	quantity: number;
+	quantity: string;
 	stock: 'available' | 'unavailable';
 	categoryId: string;
 	locationId: string;
 	originalPrice: number;
 	discountPrice: number;
 	isBanner: boolean;
+	bannerImage?: string;
 	reviews?: string[];
 	createdAt: Date;
 	updatedAt: Date;
@@ -29,20 +27,18 @@ const ProductSchema = new Schema<IProduct>(
 	{
 		name: { type: String, required: true },
 		slug: { type: String, unique: true },
-		images: {
-			main: { type: String, required: true },
-			banner: { type: String },
-		},
+		mainImage: { type: String, required: true },
 		caption: { type: String, required: true },
 		description: { type: String, required: true },
 		about: { type: String, required: true },
-		quantity: { type: Number, required: true, min: 0 },
+		quantity: { type: String, required: true, min: 0 },
 		stock: { type: String, enum: ['available', 'unavailable'], required: true, min: 0 },
 		categoryId: { type: String, ref: "Category", required: true },
 		locationId: { type: String, ref: "Location", required: true },
 		originalPrice: { type: Number, required: true, min: 0 },
 		discountPrice: { type: Number, required: true, min: 0 },
 		isBanner: { type: Boolean, default: false },
+		bannerImage: { type: String },
 		reviews: [{ type: [String], ref: "Review" }],
 	},
 	{ timestamps: true }

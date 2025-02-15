@@ -20,7 +20,7 @@ const CategoriesPage = async () => {
     return (
       <div className='w-full h-full flex flex-col items-center justify-center text-center gap-6'>
         <h1 className='text-5xl font-bold'>No Categories found!</h1>
-        <p className='w-[50ch] text-sm font-normal text-muted-foreground'>Looks like there are no categories yet. But don't worry, you can create one in just a click!</p>
+        <p className='w-[50ch] text-sm font-normal text-muted-foreground'>Looks like there are no categories yet. But don&apos;t worry, you can create one in just a click!</p>
         <AddCategoriesModal
           triggerButton={
             <Button variant='default' className='mt-0'>
