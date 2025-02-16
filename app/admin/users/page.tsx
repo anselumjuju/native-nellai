@@ -24,7 +24,7 @@ const UsersPage = async () => {
 
   return (
     <div className='pt-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
-      <h1 className='text-lg font-semibold'>Users</h1>
+      <h1 className='w-full max-w-screen-xl text-lg font-semibold'>Users</h1>
       <div className='w-full max-w-screen-xl overflow-hidden rounded-lg border border-border bg-background'>
         <Table>
           <TableHeader>
