@@ -49,6 +49,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
       router.push('/');
     } catch (err) {
       toast.error('Error logging in');
+      console.log(err);
     }
   };
 
@@ -56,10 +57,12 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      console.log(result);
       toast.success('Signed up successfully');
       router.push('/');
     } catch (err) {
       toast.error('Error logging in');
+      console.log(err);
     }
   };
 

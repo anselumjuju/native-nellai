@@ -33,6 +33,7 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 			method,
 			headers,
 			body,
+			cache: 'no-store'
 		});
 
 		if (!res.ok) throw new Error(res.statusText);

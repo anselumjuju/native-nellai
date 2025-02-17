@@ -14,7 +14,7 @@ const DeleteButton = ({ id, endpoint }: { id: string; endpoint: HandleRequestPro
   };
 
   return (
-    <button className='w-full text-left text-destructive' onClick={() => handleDelete()} disabled={isPending}>
+    <button className='w-full text-left text-red-500' onClick={() => handleDelete()} disabled={isPending}>
       {isPending ? 'Deleting...' : 'Delete'}
     </button>
   );

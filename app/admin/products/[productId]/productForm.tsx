@@ -234,11 +234,17 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
                   <SelectValue placeholder='Select Category' />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category._id} value={category._id}>
-                      {category.name}
+                  {categories.length < 1 ? (
+                    <SelectItem value='0' disabled>
+                      No categories found
                     </SelectItem>
-                  ))}
+                  ) : (
+                    categories.map((category) => (
+                      <SelectItem key={category._id} value={category._id}>
+                        {category.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             )}
@@ -258,11 +264,17 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
                   <SelectValue placeholder='Select Location' />
                 </SelectTrigger>
                 <SelectContent>
-                  {locations.map((location) => (
-                    <SelectItem key={location._id} value={location._id}>
-                      {location.name}
+                  {locations.length < 1 ? (
+                    <SelectItem value='0' disabled>
+                      No Locations found
                     </SelectItem>
-                  ))}
+                  ) : (
+                    locations.map((location) => (
+                      <SelectItem key={location._id} value={location._id}>
+                        {location.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             )}

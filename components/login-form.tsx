@@ -37,10 +37,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       const { user } = await signInWithEmailAndPassword(auth, data.email, data.password);
+      console.log(user);
       toast.success('Signed up successfully');
       router.push('/');
     } catch (err) {
       toast.error('Error logging in');
+      console.log(err);
     }
   };
 
@@ -52,6 +54,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       router.push('/');
     } catch (err) {
       toast.error('Error logging in');
+      console.log(err);
     }
   };
 
