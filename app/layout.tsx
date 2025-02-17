@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Outfit } from 'next/font/google';
+import { Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
+import { UserProvider } from '@/context/UserContext';
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -20,10 +21,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={`${outfit.variable} font-outfit antialiased`}>
-        {children}
-        <Toaster position='bottom-right' />
-      </body>
+      <UserProvider>
+        <body className={`${outfit.variable} font-outfit antialiased`}>
+          {children}
+          <Toaster position='bottom-right' />
+        </body>
+      </UserProvider>
     </html>
   );
 }
