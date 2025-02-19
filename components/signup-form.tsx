@@ -13,6 +13,7 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } f
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
 
 const formSchema = z
   .object({
@@ -27,6 +28,7 @@ const formSchema = z
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
+  const { user, setUser } = useUser();
   const {
     register,
     handleSubmit,
@@ -43,10 +45,20 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
       toast.success('Signed up successfully');
+      if (credential) {
+        setUser({
+          ...user,
+          name: credential.displayName || '',
+          email: credential.email || '',
+          uid: credential.uid || '',
+          phone: credential.phoneNumber || '',
+          profilePic: credential.photoURL || '',
+        });
+      }
       reset();
-      router.push('/');
+      router.push('/setup');
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
@@ -56,10 +68,19 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      console.log(result);
+      const { user: credential } = await signInWithPopup(auth, provider);
+      if (credential) {
+        setUser({
+          ...user,
+          name: credential.displayName || '',
+          email: credential.email || '',
+          uid: credential.uid || '',
+          phone: credential.phoneNumber || '',
+          profilePic: credential.photoURL || '',
+        });
+      }
       toast.success('Signed up successfully');
-      router.push('/');
+      router.push('/setup');
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);

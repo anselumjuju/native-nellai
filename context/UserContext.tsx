@@ -1,14 +1,14 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface User {
-  uid: string;
-  name: string;
-  email: string;
+  uid?: string;
+  name?: string;
+  email?: string;
   profilePic?: string;
-  phoneNumber?: string;
-  role: 'user' | 'admin';
+  phone?: string;
+  role?: 'user' | 'admin';
   address?: {
     street?: string;
     city?: string;
@@ -16,13 +16,13 @@ interface User {
     zipCode?: string;
     country?: string;
   };
-  wishlist: string[];
-  cart: {
+  wishlist?: string[];
+  cart?: {
     productId: string;
     quantity: number;
   }[];
-  searchHistory: string[];
-  orders: string[];
+  searchHistory?: string[];
+  orders?: string[];
 }
 
 interface UserContextType {
@@ -34,6 +34,11 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    console.log('User: \n\n', user);
+    if (!user?.uid) console.log('No UID found.');
+    else console.log('\n\nUser: \nupdating to DB\n\n', user);
+  }, [user]);
 
   return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };

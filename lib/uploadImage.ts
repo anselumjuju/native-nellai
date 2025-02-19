@@ -1,5 +1,5 @@
-export const uploadImage = async (image: File) => {
-	if (!image) return null;
+export const uploadImage = async (image: File | undefined) => {
+	if (!image || image === undefined) return null;
 
 	const upload_preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 	const cloud_name = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;

@@ -13,6 +13,8 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
+import { handleRequest } from '@/lib/serverActions';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -21,7 +23,7 @@ const formSchema = z.object({
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
-
+  const { user, setUser } = useUser();
   const {
     register,
     handleSubmit,
@@ -36,9 +38,21 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const { user } = await signInWithEmailAndPassword(auth, data.email, data.password);
-      console.log(user);
+      const { user: credential } = await signInWithEmailAndPassword(auth, data.email, data.password);
       toast.success('Signed up successfully');
+      const { data: userData } = await handleRequest({ endpoint: 'users' });
+      const userUID = userData.find((user: { uid: string }) => user.uid === credential.uid);
+      if (!userUID) {
+        setUser({
+          ...user,
+          name: credential.displayName || '',
+          email: credential.email || '',
+          uid: credential.uid || '',
+          phone: credential.phoneNumber || '',
+          profilePic: credential.photoURL || '',
+        });
+        router.push('/setup');
+      }
       router.push('/');
     } catch (err) {
       toast.error('Error logging in');
@@ -49,8 +63,21 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const { user: credential } = await signInWithPopup(auth, provider);
       toast.success('Signed up successfully');
+      const { data: userData } = await handleRequest({ endpoint: 'users' });
+      const userUID = userData.find((user: { uid: string }) => user.uid === credential.uid);
+      if (!userUID) {
+        setUser({
+          ...user,
+          name: credential.displayName || '',
+          email: credential.email || '',
+          uid: credential.uid || '',
+          phone: credential.phoneNumber || '',
+          profilePic: credential.photoURL || '',
+        });
+        router.push('/setup');
+      }
       router.push('/');
     } catch (err) {
       toast.error('Error logging in');

@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
+import Image from 'next/image';
 
 const Header = () => {
   const router = useRouter();
+  const { user } = useUser();
   return (
     <header className='w-full max-w-screen-2xl mx-auto py-4 flex items-center justify-between'>
       <div className='flex items-end justify-start cursor-pointer'>
@@ -27,7 +30,14 @@ const Header = () => {
           </Button>
         ))}
       </nav>
-      <Button onClick={() => router.push('/login')}>Login In</Button>
+      {user ? (
+        <div className='flex items-center gap-2'>
+          <Image src={user.profilePic || 'https://placehold.co/400/png'} alt='Profile' width={32} height={32} className='rounded-full' />
+          <h1>{user.name || 'User'}</h1>
+        </div>
+      ) : (
+        <Button onClick={() => router.push('/login')}>Login</Button>
+      )}
     </header>
   );
 };
