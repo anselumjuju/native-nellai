@@ -4,16 +4,15 @@ export interface IUser extends Document {
 	email: string;
 	uid: string;
 	name: string;
-	profilePic?: string;
-	phoneNumber?: string;
+	profilePic: string;
+	phone: string;
 	role: "user" | "admin";
-	authProvider: "email" | "google";
 	address?: {
 		street?: string;
 		city?: string;
 		state?: string;
-		zipCode?: string;
-		country?: string;
+		zipCode: string;
+		country: string;
 	};
 	wishlist: string[];
 	cart: {
@@ -32,9 +31,8 @@ const UserSchema = new Schema<IUser>(
 		uid: { type: String, required: true, unique: true },
 		name: { type: String, required: true },
 		profilePic: { type: String },
-		phoneNumber: { type: String },
+		phone: { type: String },
 		role: { type: String, enum: ["user", "admin"], default: "user" },
-		authProvider: { type: String, enum: ["email", "google"], required: true },
 		address: {
 			street: { type: String },
 			city: { type: String },
