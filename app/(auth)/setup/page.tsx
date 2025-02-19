@@ -10,9 +10,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { uploadImage } from '@/lib/uploadImage';
 import { useUser } from '@/context/UserContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { handleRequest } from '@/lib/serverActions';
 
 const UserDetailsSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -40,6 +42,8 @@ interface IUserDetails {
 
 const Setup = () => {
   const { previewUrl, fileInputRef, handleThumbnailClick: handleButtonClick, handleFileChange, setPreviewUrl, fileName } = useImageUpload();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const { user, setUser } = useUser();
   const router = useRouter();
   const {
@@ -52,6 +56,7 @@ const Setup = () => {
   });
 
   useEffect(() => {
+    setIsInitializing(true);
     if (user) {
       setValue('name', user.name || '');
       setValue('email', user.email || '');
@@ -63,13 +68,15 @@ const Setup = () => {
       setValue('country', user.address?.country || '');
     }
     setPreviewUrl(user?.profilePic || null);
-  }, []);
+    setIsInitializing(false);
+  }, [user]);
 
   const onSubmit = async (data: IUserDetails) => {
+    setIsSubmitting(true);
     const name = data.name;
     const email = data.email;
     const phone = data.phone;
-    const profilePic = user?.profilePic || (await uploadImage(fileInputRef.current?.files?.[0])) || 'https://placehold.co/400/png';
+    const profilePic = (await uploadImage(fileInputRef.current?.files?.[0])) || user?.profilePic || 'https://placehold.co/400/png';
     const address = {
       street: data.street,
       city: data.city,
@@ -78,102 +85,136 @@ const Setup = () => {
       country: data.country,
     };
     setUser({ ...user, name, email, phone, profilePic, address });
-    router.push('/');
+    toast
+      .promise(
+        async () => {
+          const formData = new FormData();
+          formData.append('uid', `${user?.uid}`);
+          formData.append('name', name);
+          formData.append('email', email);
+          formData.append('phone', phone);
+          formData.append('profilePic', profilePic);
+          formData.append('address', JSON.stringify(address));
+          if (user?.isLoggedIn) {
+            await handleRequest({ endpoint: 'users', method: 'PATCH', id: user._id, data: formData });
+          } else {
+            await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+          }
+        },
+        {
+          loading: 'Updating user details...',
+          success: () => {
+            toast.success('User details updated successfully');
+            router.push('/');
+          },
+          error: 'Error updating user details',
+        }
+      )
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   };
 
   return (
-    <div className='w-full max-w-screen-xl mx-auto px-4 py-8'>
-      <h1 className='text-2xl font-medium'>Account Settings</h1>
-
-      <div className='lg:mx-16 mt-16 flex flex-col md:flex-row items-start gap-x-12 gap-y-6'>
-        {/* Profile Image */}
-        <div className='inline-flex items-end gap-4 align-top relative'>
-          <div className='relative flex size-48 shrink-0 items-center justify-center overflow-hidden rounded-full border border-input'>
-            {previewUrl ? (
-              <Image className='h-full w-full object-cover bg-gray-900' src={previewUrl} alt='Preview of uploaded image' width={32} height={32} />
-            ) : (
-              <div aria-hidden='true' className='size-full'>
-                <UserRound className='w-full size-full' strokeWidth={1} stroke='#9CA3AF' />
-              </div>
-            )}
-          </div>
-          <div className='absolute inline-block -right-3 bottom-2'>
-            <Button onClick={handleButtonClick} aria-haspopup='dialog' variant={'outline'} size={'sm'} className='text-xs'>
-              <Pencil className='mr-2 size-4' />
-              {fileName ? 'Change image' : 'Upload image'}
-            </Button>
-            <input type='file' ref={fileInputRef} onChange={handleFileChange} className='hidden' accept='image/*' />
-          </div>
+    <div className='w-full max-w-screen-xl mx-auto h-dvh px-4 py-8'>
+      {isInitializing ? (
+        <div className='size-full flex items-center justify-center'>
+          <h1>Fetching user details</h1>
         </div>
-        {/* Profile Details */}
-        <form onSubmit={handleSubmit(onSubmit)} className='w-full h-full flex flex-1 flex-col gap-4 relative'>
-          <div className='absolute hidden md:block w-px h-[92%] bg-neutral-400 top-0 -left-6 rounded-full' />
+      ) : (
+        <>
+          <h1 className='text-2xl font-medium'>Account Settings</h1>
+          <div className='lg:mx-16 mt-16 flex flex-col md:flex-row items-start gap-x-12 gap-y-6'>
+            {/* Profile Image */}
+            <div className='inline-flex items-end gap-4 align-top relative'>
+              <div className='relative flex size-48 shrink-0 items-center justify-center overflow-hidden rounded-full border border-input'>
+                {previewUrl ? (
+                  <Image className='size-full object-cover' src={previewUrl} alt='profile' width={48} height={48} priority unoptimized />
+                ) : (
+                  <div aria-hidden='true' className='size-full'>
+                    <UserRound className='w-full size-full' strokeWidth={1} stroke='#9CA3AF' />
+                  </div>
+                )}
+              </div>
+              <div className='absolute inline-block -right-3 bottom-2'>
+                <Button onClick={handleButtonClick} aria-haspopup='dialog' variant={'outline'} size={'sm'} className='text-xs'>
+                  <Pencil className='mr-2 size-4' />
+                  {fileName ? 'Change image' : 'Upload image'}
+                </Button>
+                <input type='file' ref={fileInputRef} onChange={handleFileChange} className='hidden' accept='image/*' />
+              </div>
+            </div>
+            {/* Profile Details */}
+            <form onSubmit={handleSubmit(onSubmit)} className='w-full h-full flex flex-1 flex-col gap-4 relative'>
+              <div className='absolute hidden md:block w-px h-[92%] bg-neutral-400 top-0 -left-6 rounded-full' />
 
-          <p className='text-lg font-semibold my-3'>User Details</p>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>Name</Label>
-            <div className='w-full space-y-1'>
-              <Input type='text' placeholder='Name' {...register('name')} />
-              {errors.name && <span className='text-red-500 text-sm'>{errors.name.message}</span>}
-            </div>
+              <p className='text-lg font-semibold my-3'>User Details</p>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>Name</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='text' placeholder='Name' {...register('name')} />
+                  {errors.name && <span className='text-red-500 text-sm'>{errors.name.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>Email</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='email' placeholder='Name' {...register('email')} />
+                  {errors.email && <span className='text-red-500 text-sm'>{errors.email.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>Phone</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='tel' placeholder='Phone' {...register('phone')} />
+                  {errors.phone && <span className='text-red-500 text-sm'>{errors.phone.message}</span>}
+                </div>
+              </div>
+              <p className='text-lg font-semibold my-3'>Address</p>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>Street</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='text' placeholder='Street' {...register('street')} />
+                  {errors.street && <span className='text-red-500 text-sm'>{errors.street.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>City</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='text' placeholder='City' {...register('city')} />
+                  {errors.city && <span className='text-red-500 text-sm'>{errors.city.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>State</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='text' placeholder='State' {...register('state')} />
+                  {errors.state && <span className='text-red-500 text-sm'>{errors.state.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>ZipCode</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='text' placeholder='ZipCode' {...register('zipCode')} />
+                  {errors.zipCode && <span className='text-red-500 text-sm'>{errors.zipCode.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+                <Label className='min-w-[10ch] font-normal'>Country</Label>
+                <div className='w-full space-y-1'>
+                  <Input type='text' placeholder='Country' {...register('country')} />
+                  {errors.country && <span className='text-red-500 text-sm'>{errors.country.message}</span>}
+                </div>
+              </div>
+              <div className='w-full lg:max-w-screen-sm mt-6 flex justify-end'>
+                <Button variant={'default'} size={'lg'} type='submit' disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                </Button>
+              </div>
+            </form>
           </div>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>Email</Label>
-            <div className='w-full space-y-1'>
-              <Input type='email' placeholder='Name' {...register('email')} />
-              {errors.email && <span className='text-red-500 text-sm'>{errors.email.message}</span>}
-            </div>
-          </div>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>Phone</Label>
-            <div className='w-full space-y-1'>
-              <Input type='tel' placeholder='Phone' {...register('phone')} />
-              {errors.phone && <span className='text-red-500 text-sm'>{errors.phone.message}</span>}
-            </div>
-          </div>
-          <p className='text-lg font-semibold my-3'>Address</p>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>Street</Label>
-            <div className='w-full space-y-1'>
-              <Input type='text' placeholder='Street' {...register('street')} />
-              {errors.street && <span className='text-red-500 text-sm'>{errors.street.message}</span>}
-            </div>
-          </div>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>City</Label>
-            <div className='w-full space-y-1'>
-              <Input type='text' placeholder='City' {...register('city')} />
-              {errors.city && <span className='text-red-500 text-sm'>{errors.city.message}</span>}
-            </div>
-          </div>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>State</Label>
-            <div className='w-full space-y-1'>
-              <Input type='text' placeholder='State' {...register('state')} />
-              {errors.state && <span className='text-red-500 text-sm'>{errors.state.message}</span>}
-            </div>
-          </div>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>ZipCode</Label>
-            <div className='w-full space-y-1'>
-              <Input type='text' placeholder='ZipCode' {...register('zipCode')} />
-              {errors.zipCode && <span className='text-red-500 text-sm'>{errors.zipCode.message}</span>}
-            </div>
-          </div>
-          <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
-            <Label className='min-w-[10ch] font-normal'>Country</Label>
-            <div className='w-full space-y-1'>
-              <Input type='text' placeholder='Country' {...register('country')} />
-              {errors.country && <span className='text-red-500 text-sm'>{errors.country.message}</span>}
-            </div>
-          </div>
-          <div className='w-full lg:max-w-screen-sm mt-6 flex justify-end'>
-            <Button variant={'default'} size={'lg'} type='submit'>
-              Submit
-            </Button>
-          </div>
-        </form>
-      </div>
+        </>
+      )}
     </div>
   );
 };

@@ -5,10 +5,26 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import Image from 'next/image';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from '../ui/dropdown-menu';
+import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import toast from 'react-hot-toast';
 
 const Header = () => {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, setUser } = useUser();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      toast.success('Signed out successfully');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <header className='w-full max-w-screen-2xl mx-auto py-4 flex items-center justify-between'>
       <div className='flex items-end justify-start cursor-pointer'>
@@ -31,10 +47,33 @@ const Header = () => {
         ))}
       </nav>
       {user ? (
-        <div className='flex items-center gap-2'>
-          <Image src={user.profilePic || 'https://placehold.co/400/png'} alt='Profile' width={32} height={32} className='rounded-full' />
-          <h1>{user.name || 'User'}</h1>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className='flex items-center gap-2'>
+              <h1>{user.name || 'User'}</h1>
+              <Image src={user.profilePic || 'https://placehold.co/400/png'} alt='Profile' width={256} height={256} className='w-8 aspect-square object-cover rounded-full' />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <button onClick={handleSignOut} className='w-full text-left text-xs'>
+                Logout
+              </button>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <button onClick={() => router.push('/setup')} className='w-full text-left text-xs'>
+                Edit Profile
+              </button>
+            </DropdownMenuItem>
+            {user.role === 'admin' && (
+              <DropdownMenuItem>
+                <button onClick={() => router.push('/admin')} className='w-full text-left text-xs'>
+                  Admin Panel
+                </button>
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
         <Button onClick={() => router.push('/login')}>Login</Button>
       )}

@@ -33,7 +33,6 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,20 +44,28 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      toast.success('Signed up successfully');
-      if (credential) {
-        setUser({
-          ...user,
-          name: credential.displayName || '',
-          email: credential.email || '',
-          uid: credential.uid || '',
-          phone: credential.phoneNumber || '',
-          profilePic: credential.photoURL || '',
-        });
-      }
-      reset();
-      router.push('/setup');
+      toast.promise(
+        async () => {
+          const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
+          if (credential) {
+            setUser({
+              ...user,
+              name: credential.displayName || '',
+              email: credential.email || '',
+              uid: credential.uid || '',
+              phone: credential.phoneNumber || '',
+              profilePic: credential.photoURL || '',
+            });
+            toast.success('Signed up successfully');
+            return router.push('/setup');
+          }
+        },
+        {
+          loading: 'Signing up...',
+          success: 'Signed up successfully',
+          error: 'Error logging in',
+        }
+      );
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
@@ -67,20 +74,29 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const handleGoogleLogin = async () => {
     try {
-      const provider = new GoogleAuthProvider();
-      const { user: credential } = await signInWithPopup(auth, provider);
-      if (credential) {
-        setUser({
-          ...user,
-          name: credential.displayName || '',
-          email: credential.email || '',
-          uid: credential.uid || '',
-          phone: credential.phoneNumber || '',
-          profilePic: credential.photoURL || '',
-        });
-      }
-      toast.success('Signed up successfully');
-      router.push('/setup');
+      toast.promise(
+        async () => {
+          const provider = new GoogleAuthProvider();
+          const { user: credential } = await signInWithPopup(auth, provider);
+          if (credential) {
+            setUser({
+              ...user,
+              name: credential.displayName || '',
+              email: credential.email || '',
+              uid: credential.uid || '',
+              phone: credential.phoneNumber || '',
+              profilePic: credential.photoURL || '',
+            });
+            toast.success('Signed up successfully');
+            return router.push('/setup');
+          }
+        },
+        {
+          loading: 'Signing up...',
+          success: 'Signed up successfully',
+          error: 'Error logging in',
+        }
+      );
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
