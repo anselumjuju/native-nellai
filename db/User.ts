@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
+import Product from "./Product";
+import Order from "./Order";
 
 export interface IUser extends Document {
-	email: string;
 	uid: string;
 	name: string;
-	profilePic: string;
+	email: string;
 	phone: string;
+	profilePic: string;
 	role: "user" | "admin";
 	address?: {
 		street?: string;
@@ -27,11 +29,11 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
 	{
-		email: { type: String, required: true, unique: true },
 		uid: { type: String, required: true, unique: true },
 		name: { type: String, required: true },
-		profilePic: { type: String },
+		email: { type: String, required: true, unique: true },
 		phone: { type: String },
+		profilePic: { type: String },
 		role: { type: String, enum: ["user", "admin"], default: "user" },
 		address: {
 			street: { type: String },
@@ -54,8 +56,9 @@ const UserSchema = new Schema<IUser>(
 );
 
 UserSchema.pre("save", async function (next) {
-	const Product = mongoose.model("Product");
-
+	if (!this.isModified("wishlist") && !this.isModified("cart") && !this.isModified("orders")) {
+		return next();
+	}
 
 	if (this.wishlist.length > 0) {
 		const validProducts = await Product.find({ _id: { $in: this.wishlist } }).select("_id");
@@ -63,7 +66,6 @@ UserSchema.pre("save", async function (next) {
 
 		this.wishlist = this.wishlist.filter((id) => validProductIds.includes(id));
 	}
-
 
 	if (this.cart.length > 0) {
 		const validProducts = await Product.find({ _id: { $in: this.cart.map((item) => item.productId) } }).select("_id");
@@ -73,12 +75,14 @@ UserSchema.pre("save", async function (next) {
 	}
 
 	if (this.orders.length > 0) {
-		const validOrders = await mongoose.model("Orders").find({ _id: { $in: this.orders } }).select("_id");
+		const validOrders = await Order.find({ _id: { $in: this.orders } }).select("_id");
 		const validOrderIds = validOrders.map((order) => order._id.toString());
+
 		this.orders = this.orders.filter((id) => validOrderIds.includes(id));
 	}
 
 	next();
 });
+
 
 export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
