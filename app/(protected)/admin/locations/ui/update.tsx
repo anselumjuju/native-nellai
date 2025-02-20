@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { handleRequest, revalidate } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
+import toast from 'react-hot-toast';
 
 const locationSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -42,12 +43,21 @@ const UpdateLocationModal = ({ id, name, image, closeDialog }: { id: string; nam
       imageUrl = await uploadImage(data.image);
     }
     startTransition(async () => {
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('image', imageUrl);
-      await handleRequest({ endpoint: 'locations', method: 'PATCH', data: formData, id });
-      revalidate('/admin/locations');
-      closeDialog();
+      toast.promise(
+        async () => {
+          const formData = new FormData();
+          formData.append('name', data.name);
+          formData.append('image', imageUrl);
+          await handleRequest({ endpoint: 'locations', method: 'PATCH', data: formData, id });
+          revalidate('/admin/locations');
+          closeDialog();
+        },
+        {
+          loading: 'Updating location...',
+          success: 'Location updated successfully',
+          error: 'Failed to update location',
+        }
+      );
     });
   };
 

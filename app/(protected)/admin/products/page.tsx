@@ -37,7 +37,7 @@ const ProductsPage = async () => {
   const locationName = locations.find((location: { _id: string }) => location._id === data[0].locationId)?.name || 'N/A';
 
   return (
-    <div className='pt-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
+    <div className='py-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
       <div className='w-full max-w-screen-xl flex items-center justify-between'>
         <h1 className='text-lg font-semibold'>Categories</h1>
         <Link href='/admin/products/new'>

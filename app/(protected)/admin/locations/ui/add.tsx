@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { ReactNode, useState, useTransition } from 'react';
 import { handleRequest, revalidate } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
+import toast from 'react-hot-toast';
 
 const locationSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -39,14 +40,23 @@ const AddLocationModal = ({ triggerButton }: { triggerButton?: ReactNode }) => {
 
   const onSubmit = async (data: LocationFormData) => {
     startTransition(async () => {
-      const imageUrl = await uploadImage(data.image);
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('image', imageUrl);
-      await handleRequest({ endpoint: 'locations', method: 'POST', data: formData });
-      reset();
-      setOpen(false);
-      revalidate('/admin/locations');
+      toast.promise(
+        async () => {
+          const imageUrl = await uploadImage(data.image);
+          const formData = new FormData();
+          formData.append('name', data.name);
+          formData.append('image', imageUrl);
+          await handleRequest({ endpoint: 'locations', method: 'POST', data: formData });
+          reset();
+          setOpen(false);
+          revalidate('/admin/locations');
+        },
+        {
+          loading: 'Adding location...',
+          success: 'Location added successfully',
+          error: 'Failed to add location',
+        }
+      );
     });
   };
 
