@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { ChartBarStacked, Command, LayoutDashboard, MapPin, MessageCircle, Package, PackagePlus, Users } from 'lucide-react';
 
-import { NavSections } from '@/app/admin/ui/nav-sections';
-import { NavUser } from '@/app/admin/ui/buttons/user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import Link from 'next/link';
+import { NavSections } from '../nav-sections';
+import { NavUser } from '../buttons/user';
 
 const data = {
   user: { name: 'user', email: 'user@gmail.com', avatar: '/avatars/shadcn.jpg' },

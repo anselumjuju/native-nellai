@@ -1,7 +1,7 @@
-import { AppSidebar } from '@/app/admin/ui/layout/sidebar';
-import { SiteHeader } from '@/app/admin/ui/layout/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AppSidebar } from './ui/layout/sidebar';
+import { SiteHeader } from './ui/layout/header';
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

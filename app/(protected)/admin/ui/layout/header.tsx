@@ -1,11 +1,11 @@
 'use client';
 
 import { SidebarIcon } from 'lucide-react';
-import { SearchForm } from '@/app/admin/ui/inputs/search-form';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useSidebar } from '@/components/ui/sidebar';
 import ThemeToggle from '@/components/theme-toggler';
+import { SearchForm } from '../inputs/search-form';
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
