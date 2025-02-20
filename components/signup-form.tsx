@@ -130,16 +130,16 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
             <Button type='submit' className='w-full'>
               Sign Up
             </Button>
-            <Button variant='outline' className='w-full' onClick={handleGoogleLogin}>
-              Sign Up with Google
-            </Button>
-            <div className='mt-4 text-center text-sm'>
-              Already have an account?{' '}
-              <Link href='/login' className='underline underline-offset-4'>
-                Login
-              </Link>
-            </div>
           </form>
+          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin}>
+            Sign Up with Google
+          </Button>
+          <div className='mt-4 text-center text-sm'>
+            Already have an account?{' '}
+            <Link href='/login' className='underline underline-offset-4'>
+              Login
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -2,7 +2,7 @@
 
 import { auth } from '@/lib/firebase';
 import { handleRequest } from '@/lib/serverActions';
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   _id?: string;
