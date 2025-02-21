@@ -13,10 +13,12 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } f
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/context/UserContext';
+import { handleRequest } from '@/lib/serverActions';
+import useUserStore from '@/store/userStore';
 
 const formSchema = z
   .object({
+    name: z.string().min(2, { message: 'Name must be at least 2 characters' }).max(10, 'Name must be at most 10 characters'),
     email: z.string().email({ message: 'Invalid email address' }),
     password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
     confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -28,7 +30,7 @@ const formSchema = z
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const { setUser } = useUserStore();
   const {
     register,
     handleSubmit,
@@ -36,6 +38,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -44,28 +47,30 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      toast.promise(
-        async () => {
-          const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
-          if (credential) {
-            setUser({
-              ...user,
-              name: credential.displayName || '',
-              email: credential.email || '',
-              uid: credential.uid || '',
-              phone: credential.phoneNumber || '',
-              profilePic: credential.photoURL || '',
-            });
-            toast.success('Signed up successfully');
-            return router.push('/setup');
+      toast
+        .promise(
+          async () => {
+            const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            if (credential) {
+              const formData = new FormData();
+              formData.append('uid', `${credential.uid}`);
+              formData.append('name', `${data.name}`);
+              formData.append('email', `${credential.email}`);
+              await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+              setUser({
+                name: data.name,
+                email: credential.email || '',
+                role: 'user',
+              });
+            }
+          },
+          {
+            loading: 'Signing up...',
+            success: 'Signed up successfully',
+            error: 'Error logging in',
           }
-        },
-        {
-          loading: 'Signing up...',
-          success: 'Signed up successfully',
-          error: 'Error logging in',
-        }
-      );
+        )
+        .then(() => router.push('/setup'));
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
@@ -74,29 +79,35 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const handleGoogleLogin = async () => {
     try {
-      toast.promise(
-        async () => {
-          const provider = new GoogleAuthProvider();
-          const { user: credential } = await signInWithPopup(auth, provider);
-          if (credential) {
-            setUser({
-              ...user,
-              name: credential.displayName || '',
-              email: credential.email || '',
-              uid: credential.uid || '',
-              phone: credential.phoneNumber || '',
-              profilePic: credential.photoURL || '',
-            });
-            toast.success('Signed up successfully');
-            return router.push('/setup');
+      toast
+        .promise(
+          async () => {
+            const provider = new GoogleAuthProvider();
+            const { user: credential } = await signInWithPopup(auth, provider);
+            if (credential) {
+              const formData = new FormData();
+              formData.append('uid', `${credential.uid}`);
+              formData.append('name', `${credential.displayName}`);
+              formData.append('email', `${credential.email}`);
+              formData.append('phone', `${credential.phoneNumber}`);
+              formData.append('profilePic', `${credential.photoURL}`);
+              await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+              setUser({
+                name: credential.displayName || '',
+                email: credential.email || '',
+                phone: credential.phoneNumber || '',
+                profilePic: credential.photoURL || '',
+                role: 'user',
+              });
+            }
+          },
+          {
+            loading: 'Signing up...',
+            success: 'Signed up successfully',
+            error: 'Error logging in',
           }
-        },
-        {
-          loading: 'Signing up...',
-          success: 'Signed up successfully',
-          error: 'Error logging in',
-        }
-      );
+        )
+        .then(() => router.push('/setup'));
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
@@ -113,18 +124,23 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
             <div className='grid gap-2'>
+              <Label htmlFor='name'>Name</Label>
+              <Input id='name' type='text' {...register('name')} placeholder='Jhon Doe' required />
+              {errors.name && <p className='text-red-500 text-sm'>{errors.name.message}</p>}
+            </div>
+            <div className='grid gap-2'>
               <Label htmlFor='email'>Email</Label>
-              <Input id='email' type='email' {...register('email')} placeholder='m@example.com' required />
+              <Input id='email' type='email' {...register('email')} placeholder='jhondoe@example.com' required />
               {errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='password'>Password</Label>
-              <Input id='password' type='password' {...register('password')} required />
+              <Input id='password' type='password' {...register('password')} placeholder='********' required />
               {errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='confirm-password'>Confirm Password</Label>
-              <Input id='confirm-password' type='password' {...register('confirmPassword')} required />
+              <Input id='confirm-password' type='password' {...register('confirmPassword')} placeholder='********' required />
               {errors.confirmPassword && <p className='text-red-500 text-sm'>{errors.confirmPassword.message}</p>}
             </div>
             <Button type='submit' className='w-full'>

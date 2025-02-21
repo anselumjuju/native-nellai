@@ -9,12 +9,13 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { uploadImage } from '@/lib/uploadImage';
-import { useUser } from '@/context/UserContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { handleRequest } from '@/lib/serverActions';
+import useUserStore from '@/store/userStore';
+import useAuthStore from '@/store/authStore';
 
 const UserDetailsSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -44,7 +45,10 @@ const Setup = () => {
   const { previewUrl, fileInputRef, handleThumbnailClick: handleButtonClick, handleFileChange, setPreviewUrl, fileName } = useImageUpload();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  const { user, setUser } = useUser();
+
+  const { uid } = useAuthStore();
+  const { _id, name, email, phone, address, profilePic, setUser } = useUserStore();
+
   const router = useRouter();
   const {
     register,
@@ -57,26 +61,24 @@ const Setup = () => {
 
   useEffect(() => {
     setIsInitializing(true);
-    if (user) {
-      setValue('name', user.name || '');
-      setValue('email', user.email || '');
-      setValue('phone', user.phone || '');
-      setValue('street', user.address?.street || '');
-      setValue('city', user.address?.city || '');
-      setValue('state', user.address?.state || '');
-      setValue('zipCode', user.address?.zipCode || '');
-      setValue('country', user.address?.country || '');
-    }
-    setPreviewUrl(user?.profilePic || null);
+    setValue('name', name);
+    setValue('email', email);
+    setValue('phone', phone);
+    setValue('street', address?.street || '');
+    setValue('city', address?.city || '');
+    setValue('state', address?.state || '');
+    setValue('zipCode', address?.zipCode || '');
+    setValue('country', address?.country || '');
+    setPreviewUrl(profilePic !== '' ? profilePic : null);
     setIsInitializing(false);
-  }, [user]);
+  }, []);
 
   const onSubmit = async (data: IUserDetails) => {
     setIsSubmitting(true);
     const name = data.name;
     const email = data.email;
     const phone = data.phone;
-    const profilePic = (await uploadImage(fileInputRef.current?.files?.[0])) || user?.profilePic || 'https://placehold.co/400/png';
+    const uploadedProfilePic = (await uploadImage(fileInputRef.current?.files?.[0])) || profilePic || 'https://placehold.co/400/png';
     const address = {
       street: data.street,
       city: data.city,
@@ -84,34 +86,28 @@ const Setup = () => {
       zipCode: data.zipCode,
       country: data.country,
     };
-    setUser({ ...user, name, email, phone, profilePic, address });
     toast
       .promise(
         async () => {
           const formData = new FormData();
-          formData.append('uid', `${user?.uid}`);
+          formData.append('uid', `${uid}`);
           formData.append('name', name);
           formData.append('email', email);
           formData.append('phone', phone);
-          formData.append('profilePic', profilePic);
+          formData.append('profilePic', uploadedProfilePic);
           formData.append('address', JSON.stringify(address));
-          if (user?.isLoggedIn) {
-            await handleRequest({ endpoint: 'users', method: 'PATCH', id: user._id, data: formData });
-          } else {
-            await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
-          }
+          await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
+          setUser({ name, email, phone, profilePic: uploadedProfilePic, address });
         },
         {
           loading: 'Updating user details...',
-          success: () => {
-            toast.success('User details updated successfully');
-            router.push('/');
-          },
+          success: 'User details updated successfully',
           error: 'Error updating user details',
         }
       )
-      .finally(() => {
+      .then(() => {
         setIsSubmitting(false);
+        router.push('/');
       });
   };
 

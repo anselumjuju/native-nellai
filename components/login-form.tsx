@@ -13,8 +13,7 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/context/UserContext';
-import { handleRequest } from '@/lib/serverActions';
+import { useState } from 'react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -23,7 +22,7 @@ const formSchema = z.object({
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -37,32 +36,23 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
     try {
-      toast.promise(
-        async () => {
-          const { user: credential } = await signInWithEmailAndPassword(auth, data.email, data.password);
-          setUser({
-            ...user,
-            name: credential.displayName || '',
-            email: credential.email || '',
-            uid: credential.uid,
-            phone: credential.phoneNumber || '',
-            profilePic: credential.photoURL || '',
-          });
-          const { data: usersData } = await handleRequest({ endpoint: 'users' });
-          const isUser = usersData.find((user: { uid: string }) => user.uid === credential.uid);
-          if (!isUser) {
-            return router.push('/setup');
+      toast
+        .promise(
+          async () => {
+            await signInWithEmailAndPassword(auth, data.email, data.password);
+          },
+          {
+            loading: 'Logging in...',
+            success: 'Logged in successfully',
+            error: 'Error logging in',
           }
-          setUser({ ...user, ...isUser });
+        )
+        .then(() => {
+          setIsLoading(false);
           router.push('/');
-        },
-        {
-          loading: 'Logging in...',
-          success: 'Logged in successfully',
-          error: 'Error logging in',
-        }
-      );
+        });
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
@@ -70,33 +60,24 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   };
 
   const handleGoogleLogin = async () => {
+    setIsLoading(true);
     try {
-      toast.promise(
-        async () => {
-          const provider = new GoogleAuthProvider();
-          const { user: credential } = await signInWithPopup(auth, provider);
-          setUser({
-            ...user,
-            name: credential.displayName || '',
-            email: credential.email || '',
-            uid: credential.uid,
-            phone: credential.phoneNumber || '',
-            profilePic: credential.photoURL || '',
-          });
-          const { data: usersData } = await handleRequest({ endpoint: 'users' });
-          const isUser = usersData.find((user: { uid: string }) => user.uid === credential.uid);
-          if (!isUser) {
-            return router.push('/setup');
+      toast
+        .promise(
+          async () => {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+          },
+          {
+            loading: 'Logging in...',
+            success: 'Logged in successfully',
+            error: 'Error logging in',
           }
-          setUser({ ...user, ...isUser });
+        )
+        .then(() => {
+          setIsLoading(false);
           router.push('/');
-        },
-        {
-          loading: 'Logging in...',
-          success: 'Logged in successfully',
-          error: 'Error logging in',
-        }
-      );
+        });
     } catch (err) {
       toast.error('Error logging in');
       console.log(err);
@@ -122,11 +103,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Input id='password' type='password' {...register('password')} />
               {errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
             </div>
-            <Button type='submit' className='w-full'>
-              Login
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
-          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin}>
+          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin} disabled={isLoading}>
             Login with Google
           </Button>
           <div className='mt-4 text-center text-sm'>
