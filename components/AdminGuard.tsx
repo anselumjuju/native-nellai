@@ -2,17 +2,21 @@
 
 import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 
 const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
   const { user } = useUser();
 
-  useEffect(() => setIsAdmin(user?.role === 'admin'), [user]);
+  if (user === undefined) {
+    return (
+      <div className='w-full h-dvh flex items-center justify-center'>
+        <p className='text-lg font-semibold'>Checking permissions...</p>
+      </div>
+    );
+  }
 
-  if (!isAdmin) {
+  if (user && user.role !== 'admin') {
     return (
       <div className='w-full px-3 h-dvh flex flex-col items-center justify-center gap-2 lg:gap-4 text-center'>
         <h1 className='text-4xl lg:text-5xl font-bold uppercase'>Access Denied</h1>
@@ -26,7 +30,7 @@ const AdminGuard = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return isAdmin && <>{children}</>;
+  return <>{children}</>;
 };
 
 export default AdminGuard;

@@ -40,30 +40,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (user?.isLoggedIn && typeof user.address === 'string') {
-      setUser({ ...user, address: JSON.parse(user.address) });
-    }
-  }, [user]);
-
-  // check if user is logged in
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((u) => {
-      if (u) setUser({ ...user, isLoggedIn: true });
-      else setUser(null);
+    const unsubscribe = auth.onAuthStateChanged(async (u) => {
+      console.log('Auth State Changed', u);
+      if (u) {
+        const { data: users } = await handleRequest({ endpoint: 'users' });
+        const userDB = users.find((usr: { uid: string }) => usr.uid === u.uid);
+        setUser(userDB ? { ...userDB, isLoggedIn: true } : { uid: u.uid, isLoggedIn: true });
+      } else {
+        setUser(null);
+      }
     });
     return () => unsubscribe();
   }, []);
-
-  // Updates user data when user is logged in
-  useEffect(() => {
-    (async () => {
-      if (user?.isLoggedIn) {
-        const { data: users } = await handleRequest({ endpoint: 'users' });
-        const userDB = users.find((u: User) => u.uid === auth.currentUser?.uid);
-        if (userDB) setUser({ ...user, ...userDB });
-      }
-    })();
-  }, [user?.isLoggedIn]);
 
   return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };
