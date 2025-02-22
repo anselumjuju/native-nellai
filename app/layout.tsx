@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import { UserProvider } from '@/context/UserContext';
+import AuthListener from '@/components/AuthListener';
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -21,12 +21,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <UserProvider>
-        <body className={`${outfit.variable} font-outfit antialiased`}>
-          {children}
-          <Toaster position='top-center' />
-        </body>
-      </UserProvider>
+      <AuthListener />
+      <body className={`${outfit.variable} font-outfit antialiased`}>
+        {children}
+        <Toaster position='top-center' />
+      </body>
     </html>
   );
 }

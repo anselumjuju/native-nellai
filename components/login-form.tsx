@@ -13,8 +13,9 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/context/UserContext';
+import { useState } from 'react';
 import { handleRequest } from '@/lib/serverActions';
+import useUserStore from '@/store/userStore';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -23,7 +24,9 @@ const formSchema = z.object({
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useUserStore();
+
   const {
     register,
     handleSubmit,
@@ -38,68 +41,65 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
-          const { user: credential } = await signInWithEmailAndPassword(auth, data.email, data.password);
-          setUser({
-            ...user,
-            name: credential.displayName || '',
-            email: credential.email || '',
-            uid: credential.uid,
-            phone: credential.phoneNumber || '',
-            profilePic: credential.photoURL || '',
-          });
-          const { data: usersData } = await handleRequest({ endpoint: 'users' });
-          const isUser = usersData.find((user: { uid: string }) => user.uid === credential.uid);
-          if (!isUser) {
-            return router.push('/setup');
-          }
-          setUser({ ...user, ...isUser });
-          router.push('/');
+          await signInWithEmailAndPassword(auth, data.email, data.password);
         },
         {
           loading: 'Logging in...',
-          success: 'Logged in successfully',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/');
+          },
           error: 'Error logging in',
         }
       );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
           const provider = new GoogleAuthProvider();
-          const { user: credential } = await signInWithPopup(auth, provider);
-          setUser({
-            ...user,
-            name: credential.displayName || '',
-            email: credential.email || '',
-            uid: credential.uid,
-            phone: credential.phoneNumber || '',
-            profilePic: credential.photoURL || '',
-          });
+          const { user } = await signInWithPopup(auth, provider);
+          if (!user) return;
+
           const { data: usersData } = await handleRequest({ endpoint: 'users' });
-          const isUser = usersData.find((user: { uid: string }) => user.uid === credential.uid);
-          if (!isUser) {
-            return router.push('/setup');
+          const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
+
+          if (!userData) {
+            const formData = new FormData();
+            formData.append('uid', `${user.uid}`);
+            formData.append('name', `${user.displayName}`);
+            formData.append('email', `${user.email}`);
+            formData.append('phone', `${user.phoneNumber}`);
+            formData.append('profilePic', `${user.photoURL}`);
+            const { data: userData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            setUser({ _id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user' });
           }
-          setUser({ ...user, ...isUser });
-          router.push('/');
+
+          setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
         },
         {
           loading: 'Logging in...',
-          success: 'Logged in successfully',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/');
+          },
           error: 'Error logging in',
         }
       );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -122,11 +122,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Input id='password' type='password' {...register('password')} />
               {errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
             </div>
-            <Button type='submit' className='w-full'>
-              Login
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
-          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin}>
+          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin} disabled={isLoading}>
             Login with Google
           </Button>
           <div className='mt-4 text-center text-sm'>

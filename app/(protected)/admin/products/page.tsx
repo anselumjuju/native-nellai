@@ -74,8 +74,6 @@ const ProductsPage = async () => {
                           height={50}
                           className='h-12 aspect-square rounded-sm object-cover'
                           unoptimized
-                          placeholder='blur'
-                          blurDataURL={product.mainImage}
                         />
                       </TooltipTrigger>
                       <TooltipContent className='p-1 bg-secondary'>

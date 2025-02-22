@@ -13,10 +13,13 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } f
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/context/UserContext';
+import { handleRequest } from '@/lib/serverActions';
+import useUserStore from '@/store/userStore';
+import { useState } from 'react';
 
 const formSchema = z
   .object({
+    name: z.string().min(2, { message: 'Name must be at least 2 characters' }).max(10, 'Name must be at most 10 characters'),
     email: z.string().email({ message: 'Invalid email address' }),
     password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
     confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -28,7 +31,8 @@ const formSchema = z
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useUserStore();
   const {
     register,
     handleSubmit,
@@ -36,6 +40,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -44,62 +49,78 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
           const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
           if (credential) {
+            const formData = new FormData();
+            formData.append('uid', `${credential.uid}`);
+            formData.append('name', `${data.name}`);
+            formData.append('email', `${credential.email}`);
+            const { data: uploadedData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
             setUser({
-              ...user,
-              name: credential.displayName || '',
-              email: credential.email || '',
-              uid: credential.uid || '',
-              phone: credential.phoneNumber || '',
-              profilePic: credential.photoURL || '',
+              _id: uploadedData._id,
+              name: uploadedData.name || '',
+              email: uploadedData.email || '',
+              role: 'user',
             });
-            toast.success('Signed up successfully');
-            return router.push('/setup');
           }
         },
         {
           loading: 'Signing up...',
-          success: 'Signed up successfully',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/setup');
+          },
           error: 'Error logging in',
         }
       );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
           const provider = new GoogleAuthProvider();
-          const { user: credential } = await signInWithPopup(auth, provider);
-          if (credential) {
-            setUser({
-              ...user,
-              name: credential.displayName || '',
-              email: credential.email || '',
-              uid: credential.uid || '',
-              phone: credential.phoneNumber || '',
-              profilePic: credential.photoURL || '',
-            });
-            toast.success('Signed up successfully');
-            return router.push('/setup');
+          const { user } = await signInWithPopup(auth, provider);
+          if (!user) return;
+
+          const { data: usersData } = await handleRequest({ endpoint: 'users' });
+          const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
+
+          if (!userData) {
+            const formData = new FormData();
+            formData.append('uid', `${user.uid}`);
+            formData.append('name', `${user.displayName}`);
+            formData.append('email', `${user.email}`);
+            formData.append('phone', `${user.phoneNumber}`);
+            formData.append('profilePic', `${user.photoURL}`);
+            const { data: userData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            setUser({ _id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user' });
           }
+
+          setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
         },
         {
           loading: 'Signing up...',
-          success: 'Signed up successfully',
-          error: 'Error logging in',
+          success: () => {
+            toast.success('Signed up successfully');
+            router.push('/setup');
+          },
+          error: 'Error signing up',
         }
       );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,25 +134,30 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
             <div className='grid gap-2'>
+              <Label htmlFor='name'>Name</Label>
+              <Input id='name' type='text' {...register('name')} placeholder='Jhon Doe' required />
+              {errors.name && <p className='text-red-500 text-sm'>{errors.name.message}</p>}
+            </div>
+            <div className='grid gap-2'>
               <Label htmlFor='email'>Email</Label>
-              <Input id='email' type='email' {...register('email')} placeholder='m@example.com' required />
+              <Input id='email' type='email' {...register('email')} placeholder='jhondoe@example.com' required />
               {errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='password'>Password</Label>
-              <Input id='password' type='password' {...register('password')} required />
+              <Input id='password' type='password' {...register('password')} placeholder='********' required />
               {errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='confirm-password'>Confirm Password</Label>
-              <Input id='confirm-password' type='password' {...register('confirmPassword')} required />
+              <Input id='confirm-password' type='password' {...register('confirmPassword')} placeholder='********' required />
               {errors.confirmPassword && <p className='text-red-500 text-sm'>{errors.confirmPassword.message}</p>}
             </div>
-            <Button type='submit' className='w-full'>
-              Sign Up
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Signing up...' : 'Sign Up'}
             </Button>
           </form>
-          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin}>
+          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin} disabled={isLoading}>
             Sign Up with Google
           </Button>
           <div className='mt-4 text-center text-sm'>

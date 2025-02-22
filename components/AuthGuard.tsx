@@ -1,29 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import toast from 'react-hot-toast';
+import useAuthStore from '@/store/authStore';
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const [isUser, setIsUser] = useState(false);
+  const { isAuthenticated } = useAuthStore.getState();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      if (!u) {
-        toast('Please login to continue');
+    const unsubscribe = useAuthStore.subscribe((state) => {
+      if (!state.isAuthenticated) {
+        toast.error('You are not logged in');
         router.push('/login');
-      } else {
-        setIsUser(true);
       }
     });
 
     return () => unsubscribe();
   }, [router]);
 
-  return isUser && <>{children}</>;
+  return isAuthenticated ? <>{children}</> : null;
 };
 
 export default AuthGuard;
