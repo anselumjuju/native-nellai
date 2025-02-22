@@ -18,7 +18,15 @@ const AuthListener = () => {
         try {
           const { data: usersData } = await handleRequest({ endpoint: 'users' });
           const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
-          setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
+          setUser({
+            _id: userData._id,
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone,
+            profilePic: userData.profilePic,
+            role: userData.role,
+            address: JSON.parse(userData.address),
+          });
         } catch (error) {
           console.error('Error fetching user data:', error);
         }
