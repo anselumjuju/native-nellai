@@ -49,23 +49,23 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
-          setIsLoading(true);
           const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
           if (credential) {
             const formData = new FormData();
             formData.append('uid', `${credential.uid}`);
             formData.append('name', `${data.name}`);
             formData.append('email', `${credential.email}`);
-            await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            const { data: uploadedData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
             setUser({
-              name: data.name,
-              email: credential.email || '',
+              _id: uploadedData._id,
+              name: uploadedData.name || '',
+              email: uploadedData.email || '',
               role: 'user',
             });
           }
-          router.push('/setup');
         },
         {
           loading: 'Signing up...',
@@ -85,35 +85,36 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const handleGoogleLogin = async () => {
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
-          setIsLoading(true);
           const provider = new GoogleAuthProvider();
-          const { user: credential } = await signInWithPopup(auth, provider);
-          if (credential) {
+          const { user } = await signInWithPopup(auth, provider);
+          if (!user) return;
+
+          const { data: usersData } = await handleRequest({ endpoint: 'users' });
+          const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
+
+          if (!userData) {
             const formData = new FormData();
-            formData.append('uid', `${credential.uid}`);
-            formData.append('name', `${credential.displayName}`);
-            formData.append('email', `${credential.email}`);
-            formData.append('phone', `${credential.phoneNumber}`);
-            formData.append('profilePic', `${credential.photoURL}`);
-            await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
-            setUser({
-              name: credential.displayName || '',
-              email: credential.email || '',
-              phone: credential.phoneNumber || '',
-              profilePic: credential.photoURL || '',
-              role: 'user',
-            });
+            formData.append('uid', `${user.uid}`);
+            formData.append('name', `${user.displayName}`);
+            formData.append('email', `${user.email}`);
+            formData.append('phone', `${user.phoneNumber}`);
+            formData.append('profilePic', `${user.photoURL}`);
+            const { data: userData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            setUser({ _id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user' });
           }
+
+          setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
         },
         {
           loading: 'Signing up...',
           success: () => {
-            toast.success('Logged in successfully');
+            toast.success('Signed up successfully');
             router.push('/setup');
           },
-          error: 'Error logging in',
+          error: 'Error signing up',
         }
       );
     } catch (err) {

@@ -25,7 +25,7 @@ const AuthListener = () => {
             phone: userData.phone,
             profilePic: userData.profilePic,
             role: userData.role,
-            address: JSON.parse(userData.address),
+            address: userData.address !== undefined ? JSON.parse(userData.address) : undefined,
           });
         } catch (error) {
           console.error('Error fetching user data:', error);

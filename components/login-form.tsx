@@ -14,6 +14,8 @@ import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { handleRequest } from '@/lib/serverActions';
+import useUserStore from '@/store/userStore';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -23,6 +25,8 @@ const formSchema = z.object({
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useUserStore();
+
   const {
     register,
     handleSubmit,
@@ -36,8 +40,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
           await signInWithEmailAndPassword(auth, data.email, data.password);
@@ -53,16 +57,35 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       );
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       toast.promise(
         async () => {
           const provider = new GoogleAuthProvider();
-          await signInWithPopup(auth, provider);
+          const { user } = await signInWithPopup(auth, provider);
+          if (!user) return;
+
+          const { data: usersData } = await handleRequest({ endpoint: 'users' });
+          const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
+
+          if (!userData) {
+            const formData = new FormData();
+            formData.append('uid', `${user.uid}`);
+            formData.append('name', `${user.displayName}`);
+            formData.append('email', `${user.email}`);
+            formData.append('phone', `${user.phoneNumber}`);
+            formData.append('profilePic', `${user.photoURL}`);
+            const { data: userData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            setUser({ _id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user' });
+          }
+
+          setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
         },
         {
           loading: 'Logging in...',
