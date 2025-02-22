@@ -38,14 +38,18 @@ const Header = () => {
       <nav className='hidden lg:flex items-center gap-8 *:text-foreground'>
         {[
           { link: '/', name: 'Home' },
-          { link: '/', name: 'Shop' },
-          { link: '/', name: 'About Us' },
-          { link: '/', name: 'Contact' },
+          { link: '/products', name: 'Products' },
+          { link: '/categories', name: 'Categories' },
         ].map((item, index) => (
           <Button variant={'link'} key={index}>
             <Link href={item.link}>{item.name}</Link>
           </Button>
         ))}
+        {role === 'admin' && (
+          <Button variant={'link'}>
+            <Link href='/admin'>Dashboard</Link>
+          </Button>
+        )}
       </nav>
       {isAuthenticated ? (
         <DropdownMenu>
