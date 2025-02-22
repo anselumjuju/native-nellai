@@ -3,7 +3,6 @@ import { Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import AuthListener from '@/components/AuthListener';
-import AuthLogger from '@/components/AuthLogger';
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -23,7 +22,6 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <AuthListener />
-      <AuthLogger />
       <body className={`${outfit.variable} font-outfit antialiased`}>
         {children}
         <Toaster position='top-center' />
