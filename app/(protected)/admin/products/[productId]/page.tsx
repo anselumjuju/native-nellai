@@ -13,7 +13,6 @@ const ProductPage = async ({ params }: { params: Promise<{ productId: string }> 
     );
 
   const { data, success } = await handleRequest({ endpoint: 'products', id: productId });
-  console.log(data);
 
   return (
     <div className='w-full max-w-3xl h-full pt-20 px-4 py-8 mx-auto space-y-8'>

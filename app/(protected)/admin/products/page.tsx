@@ -33,9 +33,6 @@ const ProductsPage = async () => {
     );
   }
 
-  const categoryName = categories.find((category: { _id: string }) => category._id === data[0].categoryId)?.name || 'N/A';
-  const locationName = locations.find((location: { _id: string }) => location._id === data[0].locationId)?.name || 'N/A';
-
   return (
     <div className='py-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
       <div className='w-full max-w-screen-xl flex items-center justify-between'>
@@ -61,58 +58,62 @@ const ProductsPage = async () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((product: { _id: string; name: string; mainImage: string; originalPrice: number; discountPrice: number; createdAt: string }) => (
-              <TableRow key={product._id}>
-                <TableCell>
-                  <TooltipProvider delayDuration={0}>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Image
-                          src={product.mainImage || 'https://placehold.co/400/png'}
-                          alt={product.name}
-                          width={50}
-                          height={50}
-                          className='h-12 aspect-square rounded-sm object-cover'
-                          unoptimized
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent className='p-1 bg-secondary'>
-                        <div className='w-52 aspect-square rounded-md'>
-                          <Image className='w-full h-full object-cover' src={product.mainImage} width={120} height={120} alt='Content image' unoptimized />
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-                <TableCell className='font-medium'>{product.name}</TableCell>
-                <TableCell className='hidden lg:table-cell'>{categoryName}</TableCell>
-                <TableCell className='hidden lg:table-cell'>{locationName}</TableCell>
-                <TableCell className='font-medium'>{product.originalPrice}</TableCell>
-                <TableCell className='font-medium'>{product.discountPrice}</TableCell>
+            {data.map((product: { _id: string; name: string; mainImage: string; categoryId: string; locationId: string; originalPrice: number; discountPrice: number }) => {
+              const categoryName = categories.find((category: { _id: string }) => category._id === product.categoryId)?.name || 'N/A';
+              const locationName = locations.find((location: { _id: string }) => location._id === product.locationId)?.name || 'N/A';
+              return (
+                <TableRow key={product._id}>
+                  <TableCell>
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Image
+                            src={product.mainImage || 'https://placehold.co/400/png'}
+                            alt={product.name}
+                            width={50}
+                            height={50}
+                            className='h-12 aspect-square rounded-sm object-cover'
+                            unoptimized
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent className='p-1 bg-secondary'>
+                          <div className='w-52 aspect-square rounded-md'>
+                            <Image className='w-full h-full object-cover' src={product.mainImage} width={120} height={120} alt='Content image' unoptimized />
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell className='font-medium'>{product.name}</TableCell>
+                  <TableCell className='hidden lg:table-cell'>{categoryName}</TableCell>
+                  <TableCell className='hidden lg:table-cell'>{locationName}</TableCell>
+                  <TableCell className='font-medium'>{product.originalPrice}</TableCell>
+                  <TableCell className='font-medium'>{product.discountPrice}</TableCell>
 
-                <TableCell className='text-right space-x-2 flex items-center justify-end'>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size='icon' variant='ghost' className='rounded-full shadow-none' aria-label='Open edit menu'>
-                        <Ellipsis size={16} strokeWidth={2} aria-hidden='true' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <Link href={`/admin/products/${product._id}`}>
-                            <button className='w-full text-left text-xs'>Edit</button>
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <DeleteButton id={product._id} endpoint='products' />
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                  <TableCell className='text-right space-x-2 flex items-center justify-end'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size='icon' variant='ghost' className='rounded-full shadow-none' aria-label='Open edit menu'>
+                          <Ellipsis size={16} strokeWidth={2} aria-hidden='true' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem>
+                            <Link href={`/admin/products/${product._id}`}>
+                              <button className='w-full text-left text-xs'>Edit</button>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <DeleteButton id={product._id} endpoint='products' />
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>

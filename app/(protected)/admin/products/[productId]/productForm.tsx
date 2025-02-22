@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { handleRequest } from '@/lib/serverActions';
 import { uploadImage } from '@/lib/uploadImage';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export const formSchema = z
   .object({
@@ -49,10 +51,10 @@ interface ProductFormProps {
 }
 
 const ProductForm = ({ product, productId }: ProductFormProps) => {
+  const router = useRouter();
   const [locations, setLocations] = useState<{ _id: string; name: string }[]>([]);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [locationId, setLocationId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,8 +62,6 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       const { data: locations } = await handleRequest({ endpoint: 'locations' });
       setCategories(categories);
       setLocations(locations);
-      setCategoryId(categories.find((category: { _id: string }) => category._id === product?.categoryId)?._id || 'N/A');
-      setLocationId(locations.find((location: { _id: string }) => location._id === product?.locationId)?._id || 'N/A');
     })();
   }, []);
 
@@ -75,8 +75,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       about: product?.about || '',
       quantity: product?.quantity || '',
       stock: product?.stock || '',
-      categoryId: '',
-      locationId: '',
+      categoryId: product?.categoryId || '',
+      locationId: product?.locationId || '',
       originalPrice: product?.originalPrice || '',
       discountPrice: product?.discountPrice || '',
       isBanner: product?.isBanner || false,
@@ -85,38 +85,42 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
   });
 
   const handleSubmit = async (data: any) => {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('mainImage', await uploadImage(data.mainImage[0]));
-    formData.append('caption', data.caption);
-    formData.append('description', data.description);
-    formData.append('about', data.about);
-    formData.append('quantity', data.quantity);
-    formData.append('stock', data.stock);
-    formData.append('categoryId', data.categoryId);
-    formData.append('locationId', data.locationId);
-    formData.append('originalPrice', data.originalPrice.toString());
-    formData.append('discountPrice', data.discountPrice.toString());
-    formData.append('isBanner', data.isBanner.toString());
-    if (data.bannerImage) formData.append('bannerImage', await uploadImage(data.bannerImage[0]));
-
-    if (!productId) {
-      console.log('Adding new product');
-      const { success } = await handleRequest({ endpoint: 'products', method: 'POST', data: formData });
-
-      if (success) {
-        form.reset();
-        window.location.href = '/admin/products';
-      }
-    } else {
-      console.log('Updating product');
-      const { success } = await handleRequest({ endpoint: 'products', method: 'PATCH', data: formData, id: productId });
-
-      if (success) {
-        form.reset();
-        window.location.href = '/admin/products';
-      }
-    }
+    setIsLoading(true);
+    toast
+      .promise(
+        async () => {
+          const formData = new FormData();
+          formData.append('name', data.name);
+          formData.append('mainImage', await uploadImage(data.mainImage[0]));
+          formData.append('caption', data.caption);
+          formData.append('description', data.description);
+          formData.append('about', data.about);
+          formData.append('quantity', data.quantity);
+          formData.append('stock', data.stock);
+          formData.append('categoryId', data.categoryId);
+          formData.append('locationId', data.locationId);
+          formData.append('originalPrice', data.originalPrice.toString());
+          formData.append('discountPrice', data.discountPrice.toString());
+          formData.append('isBanner', data.isBanner.toString());
+          if (data.bannerImage) formData.append('bannerImage', await uploadImage(data.bannerImage[0]));
+          if (!productId) {
+            await handleRequest({ endpoint: 'products', method: 'POST', data: formData });
+          } else {
+            await handleRequest({ endpoint: 'products', method: 'PATCH', data: formData, id: productId });
+          }
+        },
+        {
+          loading: !productId ? 'Adding product...' : 'Updating product...',
+          success: () => {
+            toast.success(!productId ? 'Product added successfully' : 'Product updated successfully');
+            router.push('/admin/products');
+          },
+          error: !productId ? 'Failed to add product' : 'Failed to update product',
+        }
+      )
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -154,7 +158,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
         <Label>
           Product Description <span className='text-destructive'>*</span>
         </Label>
-        <Input {...form.register('description')} placeholder='Product Description' type='text' />
+        <Textarea {...form.register('description')} id='description' placeholder='Product Description' className='h-14 max-h-32 resize-y' />
         {form.formState.errors.description && <p className='text-xs text-red-700'>{form.formState.errors.description.message}</p>}
       </div>
 
@@ -163,11 +167,11 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
         <Label className='text-sm font-semibold'>
           About <span className='text-destructive text-base'>*</span>
         </Label>
-        <Textarea {...form.register('about')} id='about' placeholder='Explain about the product' className='max-h-52 resize-y' />
+        <Textarea {...form.register('about')} id='about' placeholder='Explain about the product' className='h-24 max-h-52 resize-y' />
         {form.formState.errors.about && <p className='text-xs text-red-700'>{form.formState.errors.about.message}</p>}
       </div>
 
-      {/* Quantity Selection */}
+      {/* Quantity & Stock Selection */}
       <div className='grid lg:grid-cols-2 gap-x-4 gap-y-8'>
         <div className='space-y-3'>
           <Label>
@@ -229,7 +233,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
             control={form.control}
             name='categoryId'
             render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={categoryId}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Category' />
                 </SelectTrigger>
@@ -259,7 +263,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
             control={form.control}
             name='locationId'
             render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={locationId}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Location' />
                 </SelectTrigger>
@@ -325,7 +329,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       </div>
 
       <Button type='submit' className='w-max self-end'>
-        {!productId ? 'Add Product' : 'Update Product'}
+        {!productId ? (isLoading ? 'Adding Product...' : 'Add Product') : isLoading ? 'Updating Product...' : 'Update Product'}
       </Button>
     </form>
   );
