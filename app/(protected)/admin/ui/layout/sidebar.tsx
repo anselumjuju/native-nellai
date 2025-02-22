@@ -7,9 +7,9 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import Link from 'next/link';
 import { NavSections } from '../nav-sections';
 import { NavUser } from '../buttons/user';
+import useUserStore from '@/store/userStore';
 
 const data = {
-  user: { name: 'user', email: 'user@gmail.com', avatar: '/avatars/shadcn.jpg' },
   sections: [
     { name: 'Dashboard', url: '/admin', icon: LayoutDashboard },
     { name: 'Products', url: '/admin/products', icon: Package },
@@ -22,6 +22,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { name, email, profilePic } = useUserStore();
   return (
     <Sidebar className='top-[--header-height] !h-[calc(100svh-var(--header-height))]' {...props}>
       <SidebarHeader>
@@ -45,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSections projects={data.sections} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{ name, email, avatar: profilePic }} />
       </SidebarFooter>
     </Sidebar>
   );
