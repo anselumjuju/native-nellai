@@ -58,16 +58,7 @@ const LocationsPage = async () => {
                   <TooltipProvider delayDuration={0}>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Image
-                          src={location.image}
-                          alt={location.name}
-                          width={50}
-                          height={50}
-                          className='h-12 aspect-square rounded-sm object-cover'
-                          unoptimized
-                          placeholder='blur'
-                          blurDataURL={location.image}
-                        />
+                        <Image src={location.image} alt={location.name} width={50} height={50} className='h-12 aspect-square rounded-sm object-cover' unoptimized />
                       </TooltipTrigger>
                       <TooltipContent className='p-1 bg-secondary'>
                         <div className='w-52 aspect-square rounded-md'>

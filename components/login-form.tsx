@@ -38,23 +38,20 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      toast
-        .promise(
-          async () => {
-            await signInWithEmailAndPassword(auth, data.email, data.password);
+      toast.promise(
+        async () => {
+          await signInWithEmailAndPassword(auth, data.email, data.password);
+        },
+        {
+          loading: 'Logging in...',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/');
           },
-          {
-            loading: 'Logging in...',
-            success: 'Logged in successfully',
-            error: 'Error logging in',
-          }
-        )
-        .then(() => {
-          setIsLoading(false);
-          router.push('/');
-        });
+          error: 'Error logging in',
+        }
+      );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
     }
   };
@@ -62,25 +59,24 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      toast
-        .promise(
-          async () => {
-            const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
+      toast.promise(
+        async () => {
+          const provider = new GoogleAuthProvider();
+          await signInWithPopup(auth, provider);
+        },
+        {
+          loading: 'Logging in...',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/');
           },
-          {
-            loading: 'Logging in...',
-            success: 'Logged in successfully',
-            error: 'Error logging in',
-          }
-        )
-        .then(() => {
-          setIsLoading(false);
-          router.push('/');
-        });
+          error: 'Error logging in',
+        }
+      );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

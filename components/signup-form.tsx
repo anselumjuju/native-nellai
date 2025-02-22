@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { handleRequest } from '@/lib/serverActions';
 import useUserStore from '@/store/userStore';
+import { useState } from 'react';
 
 const formSchema = z
   .object({
@@ -30,6 +31,7 @@ const formSchema = z
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useUserStore();
   const {
     register,
@@ -47,70 +49,77 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      toast
-        .promise(
-          async () => {
-            const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
-            if (credential) {
-              const formData = new FormData();
-              formData.append('uid', `${credential.uid}`);
-              formData.append('name', `${data.name}`);
-              formData.append('email', `${credential.email}`);
-              await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
-              setUser({
-                name: data.name,
-                email: credential.email || '',
-                role: 'user',
-              });
-            }
-          },
-          {
-            loading: 'Signing up...',
-            success: 'Signed up successfully',
-            error: 'Error logging in',
+      toast.promise(
+        async () => {
+          setIsLoading(true);
+          const { user: credential } = await createUserWithEmailAndPassword(auth, data.email, data.password);
+          if (credential) {
+            const formData = new FormData();
+            formData.append('uid', `${credential.uid}`);
+            formData.append('name', `${data.name}`);
+            formData.append('email', `${credential.email}`);
+            await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            setUser({
+              name: data.name,
+              email: credential.email || '',
+              role: 'user',
+            });
           }
-        )
-        .then(() => router.push('/setup'));
+          router.push('/setup');
+        },
+        {
+          loading: 'Signing up...',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/setup');
+          },
+          error: 'Error logging in',
+        }
+      );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      toast
-        .promise(
-          async () => {
-            const provider = new GoogleAuthProvider();
-            const { user: credential } = await signInWithPopup(auth, provider);
-            if (credential) {
-              const formData = new FormData();
-              formData.append('uid', `${credential.uid}`);
-              formData.append('name', `${credential.displayName}`);
-              formData.append('email', `${credential.email}`);
-              formData.append('phone', `${credential.phoneNumber}`);
-              formData.append('profilePic', `${credential.photoURL}`);
-              await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
-              setUser({
-                name: credential.displayName || '',
-                email: credential.email || '',
-                phone: credential.phoneNumber || '',
-                profilePic: credential.photoURL || '',
-                role: 'user',
-              });
-            }
-          },
-          {
-            loading: 'Signing up...',
-            success: 'Signed up successfully',
-            error: 'Error logging in',
+      toast.promise(
+        async () => {
+          setIsLoading(true);
+          const provider = new GoogleAuthProvider();
+          const { user: credential } = await signInWithPopup(auth, provider);
+          if (credential) {
+            const formData = new FormData();
+            formData.append('uid', `${credential.uid}`);
+            formData.append('name', `${credential.displayName}`);
+            formData.append('email', `${credential.email}`);
+            formData.append('phone', `${credential.phoneNumber}`);
+            formData.append('profilePic', `${credential.photoURL}`);
+            await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
+            setUser({
+              name: credential.displayName || '',
+              email: credential.email || '',
+              phone: credential.phoneNumber || '',
+              profilePic: credential.photoURL || '',
+              role: 'user',
+            });
           }
-        )
-        .then(() => router.push('/setup'));
+        },
+        {
+          loading: 'Signing up...',
+          success: () => {
+            toast.success('Logged in successfully');
+            router.push('/setup');
+          },
+          error: 'Error logging in',
+        }
+      );
     } catch (err) {
-      toast.error('Error logging in');
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,11 +152,11 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
               <Input id='confirm-password' type='password' {...register('confirmPassword')} placeholder='********' required />
               {errors.confirmPassword && <p className='text-red-500 text-sm'>{errors.confirmPassword.message}</p>}
             </div>
-            <Button type='submit' className='w-full'>
-              Sign Up
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? 'Signing up...' : 'Sign Up'}
             </Button>
           </form>
-          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin}>
+          <Button variant='outline' className='w-full mt-6' onClick={handleGoogleLogin} disabled={isLoading}>
             Sign Up with Google
           </Button>
           <div className='mt-4 text-center text-sm'>

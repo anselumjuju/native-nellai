@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import { UserProvider } from '@/context/UserContext';
 import AuthListener from '@/components/AuthListener';
 import AuthLogger from '@/components/AuthLogger';
 
@@ -25,12 +24,10 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <AuthListener />
       <AuthLogger />
-      <UserProvider>
-        <body className={`${outfit.variable} font-outfit antialiased`}>
-          {children}
-          <Toaster position='top-center' />
-        </body>
-      </UserProvider>
+      <body className={`${outfit.variable} font-outfit antialiased`}>
+        {children}
+        <Toaster position='top-center' />
+      </body>
     </html>
   );
 }

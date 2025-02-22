@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUser } from '@/context/UserContext';
 import { handleRequest, revalidate } from '@/lib/serverActions';
 import { format } from 'date-fns';
 import { FormEvent, useState } from 'react';
@@ -13,11 +12,10 @@ import toast from 'react-hot-toast';
 const UpdateUserModal = ({ user }: { user: any }) => {
   const [selectedRole, setSelectedRole] = useState(user.role);
   const [isUpdating, setIsUpdating] = useState(false);
-  const { user: currentUser, setUser } = useUser();
+
   const handleUpdateUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsUpdating(true);
-    setUser({ ...currentUser, role: selectedRole });
     const formData = new FormData();
     formData.append('role', selectedRole);
     const { success } = await handleRequest({ endpoint: 'users', method: 'PATCH', id: user._id, data: formData });

@@ -86,29 +86,26 @@ const Setup = () => {
       zipCode: data.zipCode,
       country: data.country,
     };
-    toast
-      .promise(
-        async () => {
-          const formData = new FormData();
-          formData.append('uid', `${uid}`);
-          formData.append('name', name);
-          formData.append('email', email);
-          formData.append('phone', phone);
-          formData.append('profilePic', uploadedProfilePic);
-          formData.append('address', JSON.stringify(address));
-          await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
-          setUser({ name, email, phone, profilePic: uploadedProfilePic, address });
-        },
-        {
-          loading: 'Updating user details...',
-          success: 'User details updated successfully',
-          error: 'Error updating user details',
-        }
-      )
-      .then(() => {
+    toast.promise(
+      async () => {
+        const formData = new FormData();
+        formData.append('uid', `${uid}`);
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('profilePic', uploadedProfilePic);
+        formData.append('address', JSON.stringify(address));
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
+        setUser({ name, email, phone, profilePic: uploadedProfilePic, address });
         setIsSubmitting(false);
         router.push('/');
-      });
+      },
+      {
+        loading: 'Updating user details...',
+        success: 'User details updated successfully',
+        error: 'Error updating user details',
+      }
+    );
   };
 
   return (

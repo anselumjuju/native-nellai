@@ -1,16 +1,20 @@
 'use client';
 
-import { useUser } from '@/context/UserContext';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
+import useUserStore from '@/store/userStore';
 
 const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { user } = useUser();
+  const { role } = useUserStore.getState();
 
-  useEffect(() => setIsAdmin(user?.role === 'admin'), [user]);
+  const [isAdmin, setIsAdmin] = useState(role === 'admin');
+
+  useEffect(() => {
+    const unsubscribe = useUserStore.subscribe((state) => setIsAdmin(state.role === 'admin'));
+    return () => unsubscribe();
+  }, [router]);
 
   if (!isAdmin) {
     return (
@@ -26,7 +30,7 @@ const AdminGuard = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return isAdmin && <>{children}</>;
+  return <>{children}</>;
 };
 
 export default AdminGuard;

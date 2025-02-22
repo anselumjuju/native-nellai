@@ -51,14 +51,12 @@ const UsersPage = async () => {
                       <Tooltip>
                         <TooltipTrigger>
                           <Image
-                            src={user.profilePic}
+                            src={user.profilePic || 'https://placehold.co/400/png?text=No+Image'}
                             alt={user.name}
                             width={50}
                             height={50}
                             className='h-12 aspect-square rounded-sm object-cover'
                             unoptimized
-                            placeholder='blur'
-                            blurDataURL={user.profilePic}
                           />
                         </TooltipTrigger>
                         <TooltipContent className='p-1 bg-secondary'>
@@ -78,11 +76,11 @@ const UsersPage = async () => {
                   </TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell className='hidden lg:table-cell'>{user.email}</TableCell>
-                  <TableCell className='hidden xl:table-cell'>{user.phone}</TableCell>
+                  <TableCell className='hidden xl:table-cell'>{user.phone || 'N/A'}</TableCell>
                   <TableCell className='capitalize'>{user.role}</TableCell>
                   <TableCell className='text-right'>
                     <Dialog>
-                      <DialogTrigger>
+                      <DialogTrigger asChild>
                         <Button size='icon' variant='ghost' className='rounded-full shadow-none' aria-label='Open edit menu'>
                           <Ellipsis size={16} strokeWidth={2} aria-hidden='true' />
                         </Button>
