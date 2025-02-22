@@ -15,42 +15,56 @@ import { uploadImage } from '@/lib/uploadImage';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
-export const formSchema = z
-  .object({
-    name: z.string().min(1, 'Product Name is required'),
-    caption: z.string().min(1, 'Short Caption is required'),
-    mainImage: z.any().refine((file) => file?.length > 0, 'Main Image is required'),
-    description: z.string().min(1, 'Product Description is required'),
-    about: z.string().min(1, 'About section is required'),
-    quantity: z.enum(['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'], {
-      errorMap: () => ({ message: 'Invalid quantity selected' }),
-    }),
-    stock: z.enum(['available', 'unavailable'], {
-      errorMap: () => ({ message: 'Invalid stock status' }),
-    }),
-    categoryId: z.string().min(1, 'Category is required'),
-    locationId: z.string().min(1, 'Location is required'),
-    originalPrice: z.preprocess((val) => Number(val), z.number().positive('Original Price must be greater than zero')),
-    discountPrice: z.preprocess((val) => Number(val), z.number().nonnegative('Discount Price cannot be negative')).optional(),
-    isBanner: z.boolean().optional(),
-    bannerImage: z.any().optional(),
-  })
-  .refine(
-    (data) => {
-      return !data.isBanner || (data.isBanner && data.bannerImage);
-    },
-    {
-      message: 'Banner image is required.',
-      path: ['bannerImage'],
-    }
-  );
-
 interface ProductFormProps {
-  product?: z.infer<typeof formSchema>;
+  product?: {
+    name: string;
+    caption: string;
+    mainImage?: string;
+    description: string;
+    about: string;
+    quantity: string;
+    stock: string;
+    categoryId: string;
+    locationId: string;
+    originalPrice: number;
+    discountPrice?: number;
+    isBanner?: boolean;
+    bannerImage?: string;
+  };
   productId?: string;
 }
 
 const ProductForm = ({ product, productId }: ProductFormProps) => {
+  const formSchema = z
+    .object({
+      name: z.string().min(1, 'Product Name is required'),
+      caption: z.string().min(1, 'Short Caption is required'),
+      mainImage: z.any().refine((file) => (product?.mainImage ? true : file?.length > 0), 'Main Image is required'),
+      description: z.string().min(1, 'Product Description is required'),
+      about: z.string().min(1, 'About section is required'),
+      quantity: z.enum(['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'], {
+        errorMap: () => ({ message: 'Invalid quantity selected' }),
+      }),
+      stock: z.enum(['available', 'unavailable'], {
+        errorMap: () => ({ message: 'Invalid stock status' }),
+      }),
+      categoryId: z.string().min(1, 'Category is required'),
+      locationId: z.string().min(1, 'Location is required'),
+      originalPrice: z.preprocess((val) => Number(val), z.number().positive('Original Price must be greater than zero')),
+      discountPrice: z.preprocess((val) => Number(val), z.number().nonnegative('Discount Price cannot be negative')).optional(),
+      isBanner: z.boolean().optional(),
+      bannerImage: z.any().optional(),
+    })
+    .refine(
+      (data) => {
+        return !data.isBanner || (data.isBanner && data.bannerImage);
+      },
+      {
+        message: 'Banner image is required.',
+        path: ['bannerImage'],
+      }
+    );
+
   const router = useRouter();
   const [locations, setLocations] = useState<{ _id: string; name: string }[]>([]);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
@@ -91,7 +105,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
         async () => {
           const formData = new FormData();
           formData.append('name', data.name);
-          formData.append('mainImage', await uploadImage(data.mainImage[0]));
+          formData.append('mainImage', data.mainImage ? await uploadImage(data.mainImage[0]) : product?.mainImage);
           formData.append('caption', data.caption);
           formData.append('description', data.description);
           formData.append('about', data.about);
@@ -115,7 +129,10 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
             toast.success(!productId ? 'Product added successfully' : 'Product updated successfully');
             router.push('/admin/products');
           },
-          error: !productId ? 'Failed to add product' : 'Failed to update product',
+          error: (err: any) => {
+            console.log(err);
+            toast.error(!productId ? 'Failed to add product' : 'Failed to update product');
+          },
         }
       )
       .finally(() => {
