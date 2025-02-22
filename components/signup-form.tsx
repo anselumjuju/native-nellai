@@ -100,20 +100,19 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
             formData.append('uid', `${user.uid}`);
             formData.append('name', `${user.displayName}`);
             formData.append('email', `${user.email}`);
-            formData.append('phone', `${user.phoneNumber}`);
+            formData.append('phone', `${user.phoneNumber || ''}`);
             formData.append('profilePic', `${user.photoURL}`);
             const { data: userData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
             setUser({ _id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user' });
+            return router.push('/setup');
           }
 
           setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
+          router.push('/');
         },
         {
           loading: 'Signing up...',
-          success: () => {
-            toast.success('Signed up successfully');
-            router.push('/setup');
-          },
+          success: 'Signed up successfully',
           error: 'Error signing up',
         }
       );
