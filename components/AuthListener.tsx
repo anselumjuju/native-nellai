@@ -18,7 +18,6 @@ const AuthListener = () => {
         try {
           const { data: usersData } = await handleRequest({ endpoint: 'users' });
           const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
-          console.log(`\n\n\nUser Data: ${userData}\n`, userData);
           setUser({
             _id: userData?._id,
             name: userData?.name,
