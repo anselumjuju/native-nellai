@@ -9,13 +9,15 @@ const Featured = async () => {
   if (!productSuccess) return null;
   return (
     <div className='w-full flex flex-col items-center justify-center gap-12'>
-      <h1 className='text-3xl font-medium underline underline-offset-8'>Featured Products</h1>
+      <h1 className='text-3xl font-medium relative after:content-[""] after:h-0.5 after:absolute after:-bottom-4 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-400 after:block after:mx-auto'>
+        Featured Products
+      </h1>
       <div className='w-full h-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8'>
         {[...products, ...products].map(
           (product: { _id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number }, i: number) => (
             <Link
               href={`/products/${product.slug}`}
-              key={product.slug}
+              key={product.slug + i}
               className='w-full max-w-64 h-full mx-auto flex flex-col items-start justify-center gap-0.5 rounded-lg overflow-hidden'>
               <div className='w-full h-64 rounded-lg overflow-hidden'>
                 <Image src={product.mainImage} alt={product.name} width={400} height={400} className='w-full h-64 object-cover rounded-lg hover:scale-110 duration-500' />

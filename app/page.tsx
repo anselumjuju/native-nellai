@@ -1,5 +1,6 @@
 import Featured from '@/components/layout/Featured';
 import Header from '@/components/layout/Header';
+import HeaderSlider from '@/components/layout/HeaderSlider';
 import Hero from '@/components/layout/Hero';
 import Locations from '@/components/layout/Locations';
 
@@ -9,7 +10,8 @@ export default async function Home() {
       <div className='border-b shadow-sm'>
         <Header />
       </div>
-      <div className='max-w-screen-xl mx-auto space-y-20'>
+      <div className='max-w-screen-xl mx-auto space-y-20 pt-10'>
+        <HeaderSlider />
         <Hero />
         <Locations />
         <Featured />

@@ -16,7 +16,7 @@ const Hero = async () => {
           (product: { _id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number }, i: number) => (
             <Link
               href={`/products/${product.slug}`}
-              key={product.slug}
+              key={product.slug + i}
               className='w-full max-w-64 h-full mx-auto flex flex-col items-start justify-center gap-0.5 rounded-lg overflow-hidden'>
               <div className='w-full h-64 rounded-lg overflow-hidden'>
                 <Image src={product.mainImage} alt={product.name} width={400} height={400} className='w-full h-64 object-cover rounded-lg hover:scale-110 duration-500' />
