@@ -6,7 +6,7 @@ import Locations from '@/components/layout/Locations';
 
 export default async function Home() {
   return (
-    <div className='w-full px-3'>
+    <div className='w-full px-3 md:px-5 pb-10'>
       <div className='border-b shadow-sm'>
         <Header />
       </div>

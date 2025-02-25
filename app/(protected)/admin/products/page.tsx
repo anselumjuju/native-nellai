@@ -36,7 +36,7 @@ const ProductsPage = async () => {
   return (
     <div className='py-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
       <div className='w-full max-w-screen-xl flex items-center justify-between'>
-        <h1 className='text-lg font-semibold'>Categories</h1>
+        <h1 className='text-lg font-semibold'>Products</h1>
         <Link href='/admin/products/new'>
           <Button variant={'outline'}>
             <Plus className='mr-1 h-4 w-4' />

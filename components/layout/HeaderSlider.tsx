@@ -15,7 +15,7 @@ const HeaderSlider = () => {
       setIsLoading(true);
       const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
       if (!productSuccess) return null;
-      const indices = Array.from({ length: 3 }, () => Math.floor(Math.random() * products.length));
+      const indices = Array.from({ length: 4 }, () => Math.floor(Math.random() * products.length));
       setData(products.filter((_: any, i: number) => indices.includes(i)));
       setIsLoading(false);
     })();
@@ -57,9 +57,9 @@ const HeaderSlider = () => {
         style={{
           transform: `translateX(-${currentSlide * 100}%)`,
         }}>
-        {data.map((data: { _id: string; caption: String; mainImage: string }, index) => (
-          <div key={data._id} className='flex flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] py-8 md:px-14 px-5 mt-6 rounded-xl min-w-full'>
-            <div className='md:pl-8 mt-10 md:mt-0'>
+        {data.map((data: { _id: string; caption: string; mainImage: string }, index) => (
+          <div key={data._id} className='flex flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] py-8 px-5 mt-6 rounded-xl min-w-full'>
+            <div className='w-full md:w-auto md:pl-8 mt-10 md:mt-0'>
               <p className='md:text-base text-orange-600 pb-1'>{index % 2 == 0 ? 'Exclusive Offer' : 'Limited Time Offer'}</p>
               <h1 className='max-w-lg md:text-[40px] md:leading-[48px] text-2xl font-semibold capitalize line-clamp-2'>{data.caption}</h1>
               <div className='flex items-center mt-4 md:mt-6 '>
@@ -70,8 +70,8 @@ const HeaderSlider = () => {
                 </button>
               </div>
             </div>
-            <div className='flex items-center flex-1 justify-center'>
-              <Image className='md:w-72 w-48' src={data?.mainImage || ''} alt={`Data ${index + 1}`} width={400} height={400} priority />
+            <div className='w-full flex items-center flex-1 justify-center'>
+              <Image className='md:w-72 w-52 md:min-w-72 min-w-52' src={data?.mainImage || ''} alt={`Data ${index + 1}`} width={400} height={400} priority />
             </div>
           </div>
         ))}
