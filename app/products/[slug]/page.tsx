@@ -36,13 +36,13 @@ const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) =>
           <p className='text-base text-muted-foreground line-clamp-5 md:line-clamp-none'>{product.about}</p>
           <div className='max-w-64 grid grid-cols-2 gap-4'>
             <p>Quantity</p>
-            <p className='text-sm text-muted-foreground'>{product.quantity}</p>
+            <p className='text-sm text-muted-foreground capitalize'>{product.quantity}</p>
             <p>Stock</p>
-            <p className='text-sm text-muted-foreground'>{product.stock}</p>
+            <p className='text-sm text-muted-foreground capitalize'>{product.stock}</p>
           </div>
           <p className='text-2xl'>
-            <span className={`text-2xl ${product.discountPrice <= 0 ? 'line-through text-neutral-500 italic text-xl' : ''}`}>&#8377; {product.originalPrice}</span>
-            {product.discountPrice == 0 && <span className='text-2xl ml-2'>(&#8377; {product.discountPrice})</span>}
+            <span className={`text-2xl ${product.discountPrice > 0 ? 'line-through text-neutral-500 italic text-xl' : ''}`}>&#8377; {product.originalPrice}</span>
+            {product.discountPrice > 0 && <span className='text-2xl ml-2'>(&#8377; {product.discountPrice})</span>}
           </p>
           <div className='w-full flex items-center justify-start gap-4'>
             <button className='px-12 py-3 bg-neutral-200 text-primary text-sm'>Add to Cart</button>
