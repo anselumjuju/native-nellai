@@ -4,20 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { handleRequest } from '@/lib/serverActions';
-import { Skeleton } from '../ui/skeleton';
 
 const HeaderSlider = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
 
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
       const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
       if (!productSuccess) return null;
       const indices = Array.from({ length: 4 }, () => Math.floor(Math.random() * products.length));
       setData(products.filter((_: any, i: number) => indices.includes(i)));
-      setIsLoading(false);
     })();
   }, []);
 
@@ -33,22 +29,6 @@ const HeaderSlider = () => {
   const handleSlideChange = (index: number) => {
     setCurrentSlide(index);
   };
-
-  if (isLoading) {
-    return (
-      <div className='w-full h-72 px-4  bg-neutral-100 rounded-lg flex items-center justify-center relative'>
-        <Skeleton className='absolute inset-0' />
-        <div className='w-full h-56 flex items-center justify-start'>
-          <div className='w-full flex flex-col items-start justify-center gap-4'>
-            <Skeleton className='w-1/2 h-12' />
-            <Skeleton className='w-2/6 h-8' />
-            <Skeleton className='w-1/4 h-8' />
-          </div>
-        </div>
-        <Skeleton className='w-1/4 h-56' />
-      </div>
-    );
-  }
 
   return (
     <div className='overflow-hidden relative w-full'>
