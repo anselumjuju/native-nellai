@@ -49,8 +49,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         {
           loading: 'Logging in...',
           success: () => {
-            toast.success('Logged in successfully');
             router.push('/');
+            return 'Logged in successfully';
           },
           error: 'Error logging in',
         }

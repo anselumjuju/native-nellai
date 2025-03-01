@@ -126,12 +126,12 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
         {
           loading: !productId ? 'Adding product...' : 'Updating product...',
           success: () => {
-            toast.success(!productId ? 'Product added successfully' : 'Product updated successfully');
             router.push('/admin/products');
+            return !productId ? 'Product added successfully' : 'Product updated successfully';
           },
           error: (err: any) => {
             console.log(err);
-            toast.error(!productId ? 'Failed to add product' : 'Failed to update product');
+            return !productId ? 'Failed to add product' : 'Failed to update product';
           },
         }
       )

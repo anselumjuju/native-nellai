@@ -70,8 +70,9 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
         {
           loading: 'Signing up...',
           success: () => {
-            toast.success('Logged in successfully');
+            setIsLoading(false);
             router.push('/setup');
+            return 'Signed up successfully';
           },
           error: 'Error logging in',
         }
