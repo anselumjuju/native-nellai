@@ -3,6 +3,7 @@ import { handleRequest } from '@/lib/serverActions';
 
 const Categories = async () => {
   const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
+
   if (!productSuccess) return null;
   return (
     <div className='w-full flex flex-col items-center justify-center gap-12'>
@@ -10,11 +11,12 @@ const Categories = async () => {
         All Categories
       </h1>
       <div className='w-full h-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8'>
-        {products.map((product: { _id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number }) => (
-          <div key={product.slug}>
-            <ProductCard product={product} />
-          </div>
-        ))}
+        {products &&
+          products.map((product: { _id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number }) => (
+            <div key={product.slug}>
+              <ProductCard product={product} />
+            </div>
+          ))}
       </div>
     </div>
   );

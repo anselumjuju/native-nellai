@@ -2,14 +2,23 @@
 
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { handleRequest } from '@/lib/serverActions';
 import { ArrowDown } from 'lucide-react';
 import NavLink from 'next-navlink';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const SideBar = ({ categories }: { categories: { _id: string; name: string; slug: string }[] }) => {
+const SideBar = () => {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data: categories } = await handleRequest({ endpoint: 'categories' });
+      setCategories(categories);
+    })();
+  }, []);
 
   return (
     <>
