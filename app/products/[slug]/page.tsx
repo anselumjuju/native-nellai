@@ -1,6 +1,8 @@
 import ProductCard from '@/components/features/ProductCard';
 import { handleRequest } from '@/lib/serverActions';
 import Image from 'next/image';
+import CartButton from './ui/CartButton';
+import BuyNowButton from './ui/BuyNowButton';
 
 const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
@@ -45,8 +47,8 @@ const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) =>
             {product.discountPrice > 0 && <span className='text-2xl ml-2'>(&#8377; {product.discountPrice})</span>}
           </p>
           <div className='w-full flex items-center justify-start gap-4'>
-            <button className='px-12 py-3 bg-neutral-200 text-primary text-sm'>Add to Cart</button>
-            <button className='px-12 py-3 bg-orange-400 text-white text-sm'>Buy Now</button>
+            <CartButton productId={product._id} />
+            <BuyNowButton />
           </div>
         </div>
       </div>

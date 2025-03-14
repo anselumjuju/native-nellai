@@ -32,6 +32,7 @@ interface UserStoreState {
 	addToWishlist: (productId: string) => void;
 	removeFromWishlist: (productId: string) => void;
 	addToCart: (productId: string, quantity: number) => void;
+	reduceFromCart: (productId: string) => void;
 	removeFromCart: (productId: string) => void;
 	clearCart: () => void;
 	addToSearchHistory: (searchTerm: string) => void;
@@ -107,6 +108,20 @@ const useUserStore = create(
 							cart: [...state.cart, { productId, quantity }],
 						};
 					}
+				}),
+
+			reduceFromCart: (productId) =>
+				set((state) => {
+					const existingItem = state.cart.find((item) => item.productId === productId);
+					if (existingItem) {
+						return {
+							cart: state.cart.map((item) =>
+								item.productId === productId ? { ...item, quantity: Math.max(item.quantity - 1, 0) } : item
+							)
+								.filter((item) => item.quantity > 0),
+						};
+					}
+					return { cart: state.cart };
 				}),
 
 			removeFromCart: (productId) =>
