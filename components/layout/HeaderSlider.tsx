@@ -38,7 +38,6 @@ const HeaderSlider = () => {
 
   useEffect(() => {
     (async () => {
-      await new Promise((resolve) => setTimeout(resolve, 10000));
       const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
       if (!productSuccess) return null;
       const indices = Array.from({ length: 4 }, () => Math.floor(Math.random() * products.length) % products.length);

@@ -7,9 +7,10 @@ export interface HandleRequestProps {
 	method?: 'GET' | 'POST' | 'DELETE' | 'PATCH';
 	id?: string;
 	data?: FormData;
+	pathToRevalidate?: string;
 }
 
-export async function handleRequest({ endpoint, method = 'GET', id, data }: HandleRequestProps) {
+export async function handleRequest({ endpoint, method = 'GET', id, data, pathToRevalidate }: HandleRequestProps) {
 	try {
 		const url = `${process.env.BASE_URL}/api/${endpoint}${id && method !== 'POST' ? `/${id}` : ''}`;
 
@@ -33,11 +34,13 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 			method,
 			headers,
 			body,
-			cache: 'no-store'
 		});
 
 		if (!res.ok) throw new Error(res.statusText);
 		const resData = await res.json();
+
+		if (pathToRevalidate) revalidatePath(pathToRevalidate);
+
 		return resData;
 
 	} catch (e) {

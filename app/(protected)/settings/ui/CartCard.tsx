@@ -3,10 +3,11 @@
 import { handleRequest } from '@/lib/serverActions';
 import useUserStore from '@/store/userStore';
 import { Minus, Plus } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
-const CartButton = ({ productId }: { productId: string }) => {
+const CartCard = ({ mainImage, name, price, quantity, productId }: { mainImage: string; name: string; price: number; quantity: number; productId: string }) => {
   const { _id, addToCart, cart, reduceFromCart } = useUserStore();
   const [cartCount, setCartCount] = useState(cart.find((item) => item.productId === productId)?.quantity || 0);
 
@@ -24,6 +25,7 @@ const CartButton = ({ productId }: { productId: string }) => {
         error: 'Failed to add to cart',
       },
       {
+        id: 'cart',
         position: 'bottom-right',
       }
     );
@@ -43,6 +45,7 @@ const CartButton = ({ productId }: { productId: string }) => {
         error: 'Failed to remove from cart',
       },
       {
+        id: 'cart',
         position: 'bottom-right',
       }
     );
@@ -52,17 +55,29 @@ const CartButton = ({ productId }: { productId: string }) => {
     setCartCount(cart.find((item) => item.productId === productId)?.quantity || 0);
   }, [cart]);
 
-  return cartCount <= 0 ? (
-    <button className='px-12 py-3 bg-neutral-200 text-primary text-sm' onClick={handleAddToCart}>
-      Add to Cart
-    </button>
-  ) : (
-    <div className='px-3 py-3 bg-neutral-200 text-primary flex items-center justify-between gap-6'>
-      <Minus className='w-6 text-neutral-900 cursor-pointer' onClick={handleReduceFromCart} />
-      <p className='text-lg'>{cartCount}</p>
-      <Plus className='w-6 text-neutral-900 cursor-pointer' onClick={handleAddToCart} />
+  return (
+    <div className='flex items-stretch md:items-center justify-between'>
+      <div className='flex items-center justify-start gap-4'>
+        <Image src={mainImage || 'https://placehold.co/400/png'} alt={'name'} width={64} height={64} className='size-20 rounded-md object-cover' />
+        <p className='w-[15ch] text-base line-clamp-2'>{name}</p>
+      </div>
+      <p className='hidden lg:block'>Rs. {price * cartCount}</p>
+      <div className='flex items-end justify-start gap-3 flex-col'>
+        <p className='lg:hidden'>Rs. {price * cartCount}</p>
+        <div className='flex items-center justify-center gap-4'>
+          <Minus
+            className='size-6 p-1 text-neutral-500 border rounded-full border-neutral-500 cursor-pointer hover:scale-105 hover:text-neutral-600 hover:border=neutral-600'
+            onClick={handleReduceFromCart}
+          />
+          <p>{quantity}</p>
+          <Plus
+            className='size-6 p-1 text-neutral-500 border rounded-full border-neutral-500 cursor-pointer hover:scale-105 hover:text-neutral-600 hover:border=neutral-600'
+            onClick={handleAddToCart}
+          />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default CartButton;
+export default CartCard;
