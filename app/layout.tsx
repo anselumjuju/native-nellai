@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import AuthListener from '@/components/AuthListener';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { headers } from 'next/headers';
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -16,11 +17,15 @@ export const metadata: Metadata = {
   description: 'Discover authentic traditional and local products from Nellai.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const referer = headersList.get('referer');
+  const pathname = referer ? new URL(referer).pathname : '/';
+
   return (
     <html lang='en' suppressHydrationWarning>
       <AuthListener />
@@ -29,9 +34,11 @@ export default function RootLayout({
           <Header />
         </div>
         <div className='min-h-[100vh]'>{children}</div>
-        <div className='w-full bg-neutral-900 text-white'>
-          <Footer />
-        </div>
+        {!pathname.includes('/admin') && (
+          <div className='w-full bg-neutral-900 text-white'>
+            <Footer />
+          </div>
+        )}
         <Toaster position='top-center' />
       </body>
     </html>
