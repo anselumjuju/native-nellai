@@ -11,8 +11,7 @@ export interface IOrder extends Document {
 	totalPrice: number;
 	status: "pending" | "shipped" | "delivered" | "cancelled";
 	paymentStatus: "paid" | "pending" | "failed";
-	transactionId?: string;
-	upiId?: string;
+	orderId?: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -37,8 +36,7 @@ const OrderSchema = new Schema<IOrder>(
 			enum: ["paid", "pending", "failed"],
 			default: "pending",
 		},
-		transactionId: { type: String },
-		upiId: { type: String },
+		orderId: { type: String },
 	},
 	{ timestamps: true }
 );
@@ -46,20 +44,6 @@ const OrderSchema = new Schema<IOrder>(
 OrderSchema.pre("save", async function (next) {
 	const userExists = await User.findById(this.userId);
 	if (!userExists) throw new Error("Invalid userId: User does not exist");
-	let total = 0;
-	for (const item of this.items) {
-		const product = await Product.findById(item.productId);
-		if (!product) {
-			throw new Error(`Invalid productId: Product with ID ${item.productId} does not exist`);
-		}
-		if (product.stock === 'unavailable') throw new Error(`Product with ID ${item.productId} is unavailable`);
-		const price = product.discountPrice > 0 ? product.discountPrice : product.originalPrice;
-		total += price * item.quantity;
-	}
-	this.totalPrice = total;
-	if (this.transactionId && this.paymentStatus !== "paid") {
-		throw new Error("Transaction ID should only be set if payment is marked as 'paid'.");
-	}
 	next();
 });
 
