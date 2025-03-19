@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import Product from "./Product";
 import User from "./User";
 
 export interface IOrder extends Document {

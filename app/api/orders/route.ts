@@ -20,13 +20,6 @@ export async function POST(req: NextRequest) {
 		await connectToDatabase();
 		const body = await req.json();
 
-		const existingOrder = await Order.findOne({ name: body.name.trim().toLowerCase() });
-		if (existingOrder) {
-			return NextResponse.json({
-				status: 409, success: false, message: "Order already exists", error: { code: "CONFLICT", details: "A order with the same name already exists." }
-			}, { status: 409 });
-		}
-
 		const newOrder = await Order.create(body);
 		return NextResponse.json({
 			status: 201, success: true, message: "Order created successfully", data: newOrder
