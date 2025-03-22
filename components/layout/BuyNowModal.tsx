@@ -2,9 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { handleRequest } from '@/lib/serverActions';
 import useUserStore from '@/store/userStore';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Script from 'next/script';
+import toast from 'react-hot-toast';
 
 const BuyNowModal = ({
   products,
@@ -13,7 +16,8 @@ const BuyNowModal = ({
   products: { _id: string; mainImage: string; name: string; originalPrice: number; discountPrice: number }[];
   total: number;
 }) => {
-  const { _id, cart } = useUserStore();
+  const { _id, cart, clearCart, addToOrders } = useUserStore();
+  const router = useRouter();
 
   const handleBuyNow = async () => {
     const res = await fetch('/api/createOrder', {
@@ -43,12 +47,15 @@ const BuyNowModal = ({
             },
           }),
         });
-        const verifyResponse: { isOk: boolean } = await res.json();
+        const verifyResponse: { isOk: boolean; data: { _id: string } } = await res.json();
         if (verifyResponse.isOk) {
-          // do whatever page transition you want here as payment was successful
-          alert('Payment successful');
+          addToOrders(verifyResponse.data._id);
+          clearCart();
+          await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart: [], orders: useUserStore.getState().orders } });
+          toast.success('Payment successful');
+          router.push('/settings/orders');
         } else {
-          alert('Payment failed');
+          toast.error('Payment failed, Your order has not been placed', { id: 'payment-failed', duration: 5000 });
         }
       },
     };
@@ -76,13 +83,9 @@ const BuyNowModal = ({
 
                 return (
                   <div className='w-full flex items-center gap-4' key={item.productId}>
-                    <Image
-                      src={currentPrdt.mainImage || 'https://placehold.co/400/png'}
-                      alt={'name'}
-                      width={64}
-                      height={64}
-                      className='size-14 p-2 rounded-full object-cover bg-neutral-200'
-                    />
+                    <div className='size-14 aspect-square flex items-center justify-center rounded-full bg-neutral-200'>
+                      <Image src={currentPrdt.mainImage || 'https://placehold.co/400/png'} alt={'name'} width={128} height={128} className='size-[80%] object-cover' />
+                    </div>
                     <p className='w-full text-base line-clamp-2 text-neutral-800'>{currentPrdt.name}</p>
                     <div className='justify-self-end'>
                       <p className='text-sm text-right'>&#8377;&nbsp;{(currentPrdt.discountPrice || currentPrdt.originalPrice) * item.quantity}</p>

@@ -16,10 +16,7 @@ const generatedSignature = (
 };
 
 export async function POST(request: NextRequest) {
-	const { orderId, razorpayPaymentId, razorpaySignature, orderDetails } =
-		await request.json();
-	console.log('\n\nOrder Details: ')
-	console.log(orderDetails)
+	const { orderId, razorpayPaymentId, razorpaySignature, orderDetails } = await request.json();
 	const signature = generatedSignature(orderId, razorpayPaymentId);
 	if (signature !== razorpaySignature) {
 		console.log("payment verification failed from the route.ts file");
@@ -30,7 +27,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	// Probably some database calls here to update order or add premium status to user
-	const { success } = await handleRequest({ endpoint: 'orders', method: 'POST', id: orderDetails.orderId, data: orderDetails });
+	const { success, data } = await handleRequest({ endpoint: 'orders', method: 'POST', id: orderDetails.orderId, data: orderDetails });
 
 	if (!success) {
 		return NextResponse.json(
@@ -40,7 +37,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	return NextResponse.json(
-		{ message: "payment verified successfully", isOk: true },
+		{ message: "payment verified successfully", isOk: true, data },
 		{ status: 200 }
 	);
 }  
