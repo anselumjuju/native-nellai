@@ -6,7 +6,7 @@ export interface HandleRequestProps {
 	endpoint: 'categories' | 'locations' | 'orders' | 'products' | 'reviews' | 'users';
 	method?: 'GET' | 'POST' | 'DELETE' | 'PATCH';
 	id?: string;
-	data?: FormData;
+	data?: FormData | object;
 }
 
 export async function handleRequest({ endpoint, method = 'GET', id, data }: HandleRequestProps) {
@@ -25,6 +25,9 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 					jsonObject[key] = value as string;
 				});
 				body = JSON.stringify(jsonObject);
+				headers = { 'Content-Type': 'application/json' };
+			} else {
+				body = JSON.stringify(data);
 				headers = { 'Content-Type': 'application/json' };
 			}
 		}

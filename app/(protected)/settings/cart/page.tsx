@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import CartCard from '../ui/CartCard';
 import { handleRequest } from '@/lib/serverActions';
+import BuyNowModal from '@/components/layout/BuyNowModal';
 
 const Cart = () => {
   const [products, setProducts] = useState([]);
   const [isloading, setIsLoading] = useState(true);
-  const [total, setTotal] = useState(0);
+  const [total, setTotal] = useState<number>(0);
   const { cart } = useUserStore();
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const Cart = () => {
     cart.forEach((item) => {
       const currentPrdt = products.find((product: { _id: string }) => product._id === item.productId) as { _id: string; originalPrice: number; discountPrice: number } | undefined;
       if (currentPrdt) {
-        newTotal += (currentPrdt.originalPrice - currentPrdt.discountPrice) * item.quantity;
+        newTotal += (currentPrdt.discountPrice || currentPrdt.originalPrice) * item.quantity;
       }
     });
     setTotal(newTotal);
@@ -61,7 +62,7 @@ const Cart = () => {
             <CartCard
               name={currentPrdt.name}
               mainImage={currentPrdt.mainImage}
-              price={currentPrdt.originalPrice - currentPrdt.discountPrice}
+              price={currentPrdt.discountPrice || currentPrdt.originalPrice}
               quantity={item.quantity}
               productId={item.productId}
             />
@@ -74,7 +75,7 @@ const Cart = () => {
             Total: <span className='text-lg font-semibold'>{total}</span>
           </h1>
         </div>
-        <button className='px-4 py-2 bg-orange-500 text-white'>Checkout</button>
+        <BuyNowModal products={products} total={total} />
       </div>
     </div>
   );
