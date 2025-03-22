@@ -72,6 +72,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		}
 
 		const body = await req.json();
+
+
+		// Check if items exists and is a string before parsing
+		if (body.items && typeof body.items === 'string') {
+			try {
+				body.items = JSON.parse(body.items);
+			} catch (error) {
+				return NextResponse.json({
+					status: 400,
+					success: false,
+					message: "Invalid items format",
+					error: { code: "BAD_REQUEST", details: "Items must be a valid JSON array." }
+				}, { status: 400 });
+			}
+		}
+
 		if (!Object.keys(body).length) {
 			return NextResponse.json({
 				status: 400, success: false, message: "Update data is required",

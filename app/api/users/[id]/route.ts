@@ -72,6 +72,64 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		}
 
 		const body = await req.json();
+
+		// Check if address exists and is a string before parsing
+		if (body.address && typeof body.address === 'string') {
+			try {
+				body.address = JSON.parse(body.address);
+			} catch (error) {
+				return NextResponse.json({
+					status: 400,
+					success: false,
+					message: "Invalid address format",
+					error: { code: "BAD_REQUEST", details: "Address must be a valid JSON object." }
+				}, { status: 400 });
+			}
+		}
+
+
+		// Check if cart exists and is a string before parsing
+		if (body.cart && typeof body.cart === 'string') {
+			try {
+				body.cart = JSON.parse(body.cart);
+			} catch (error) {
+				return NextResponse.json({
+					status: 400,
+					success: false,
+					message: "Invalid cart format",
+					error: { code: "BAD_REQUEST", details: "Cart must be a valid JSON array." }
+				}, { status: 400 });
+			}
+		}
+
+		// Check if wishlist exists and is a string before parsing
+		if (body.wishlist && typeof body.wishlist === 'string') {
+			try {
+				body.wishlist = JSON.parse(body.wishlist);
+			} catch (error) {
+				return NextResponse.json({
+					status: 400,
+					success: false,
+					message: "Invalid wishlist format",
+					error: { code: "BAD_REQUEST", details: "Wishlist must be a valid JSON array." }
+				}, { status: 400 });
+			}
+		}
+
+		// Check if orders exists and is a string before parsing
+		if (body.orders && typeof body.orders === 'string') {
+			try {
+				body.orders = JSON.parse(body.orders);
+			} catch (error) {
+				return NextResponse.json({
+					status: 400,
+					success: false,
+					message: "Invalid orders format",
+					error: { code: "BAD_REQUEST", details: "Orders must be a valid JSON array of strings." }
+				}, { status: 400 });
+			}
+		}
+
 		if (!Object.keys(body).length) {
 			return NextResponse.json({
 				status: 400, success: false, message: "Update data is required",
