@@ -1,9 +1,11 @@
 'use client';
 
+import { handleRequest } from '@/lib/serverActions';
 import useUserStore from '@/store/userStore';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 interface ProductCardProps {
   product: {
@@ -18,13 +20,37 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { wishlist, addToWishlist, removeFromWishlist } = useUserStore();
+  const { _id, wishlist, addToWishlist, removeFromWishlist } = useUserStore();
+
+  const handleClick = async (productId: string) => {
+    if (wishlist.includes(productId)) {
+      removeFromWishlist(productId);
+    } else {
+      addToWishlist(productId);
+    }
+    toast.promise(
+      async () => {
+        const formData = new FormData();
+        formData.append('cart', JSON.stringify(wishlist));
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { wishlist } });
+      },
+      {
+        loading: 'Updating wishlist...',
+        success: 'Wishlist updated',
+        error: 'Failed to update to wishlist',
+      },
+      {
+        id: 'wishlist',
+        position: 'bottom-right',
+      }
+    );
+  };
 
   return (
     <div className='w-48 sm:w-64 h-full mx-auto flex flex-col items-start justify-between gap-0.5 rounded-lg overflow-hidden relative group'>
       <Heart
         className={`size-6 absolute top-2 right-2 text-red-500 stroke-1 scale-0 group-hover:scale-100 duration-100 ${wishlist.includes(product._id) ? 'fill-red-500' : ''}`}
-        onClick={() => (wishlist.includes(product._id) ? removeFromWishlist(product._id) : addToWishlist(product._id))}
+        onClick={() => handleClick(product._id)}
       />
       <div className='w-full aspect-square rounded-lg overflow-clip bg-neutral-100'>
         <Link href={`/products/${product.slug}`} className='w-full h-full flex items-center justify-center'>

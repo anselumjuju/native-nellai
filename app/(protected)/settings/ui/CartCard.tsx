@@ -17,7 +17,7 @@ const CartCard = ({ mainImage, name, price, quantity, productId }: { mainImage: 
       async () => {
         const formData = new FormData();
         formData.append('cart', JSON.stringify(cart));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart } });
       },
       {
         loading: 'Adding to cart...',
@@ -37,7 +37,7 @@ const CartCard = ({ mainImage, name, price, quantity, productId }: { mainImage: 
       async () => {
         const formData = new FormData();
         formData.append('cart', JSON.stringify(cart));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart } });
       },
       {
         loading: 'Removing from cart...',
