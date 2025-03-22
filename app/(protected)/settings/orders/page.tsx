@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { handleRequest } from '@/lib/serverActions';
 import useUserStore from '@/store/userStore';
@@ -26,6 +25,7 @@ const Orders = () => {
   }, []);
 
   if (isloading) return <div>Loading...</div>;
+  if (products) console.log(products);
   if (orders.length) {
     return (
       <div className='w-full h-[45vh] flex flex-col items-center justify-center gap-4'>
@@ -106,6 +106,7 @@ const Orders = () => {
                 <div className='w-28 flex items-center justify-start'>
                   {order.items.map((item, idx) => (
                     <Image
+                      key={idx}
                       src={`https://placehold.co/400/png?text=${idx + 1}`}
                       alt='product'
                       width={400}
@@ -119,7 +120,7 @@ const Orders = () => {
                   ))}
                 </div>
                 {order.items.map((item, idx) => (
-                  <p>{item.productId} - </p>
+                  <p key={idx}>{item.productId} - </p>
                 ))}
               </div>
               <p>Rs.&nbsp;{order.totalPrice}</p>
