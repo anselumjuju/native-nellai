@@ -79,6 +79,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			try {
 				body.items = JSON.parse(body.items);
 			} catch (error) {
+				console.log(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,

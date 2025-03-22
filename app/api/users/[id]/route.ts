@@ -78,6 +78,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			try {
 				body.address = JSON.parse(body.address);
 			} catch (error) {
+				console.log(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,
@@ -93,6 +94,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			try {
 				body.cart = JSON.parse(body.cart);
 			} catch (error) {
+				console.log(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,
@@ -107,6 +109,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			try {
 				body.wishlist = JSON.parse(body.wishlist);
 			} catch (error) {
+				console.log(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,
@@ -121,6 +124,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			try {
 				body.orders = JSON.parse(body.orders);
 			} catch (error) {
+				console.log(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,

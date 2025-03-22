@@ -25,7 +25,7 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 					jsonObject[key] = value as string;
 				});
 				body = JSON.stringify(jsonObject);
-				headers = { 'Content-Type': 'application/json' };
+				headers = undefined;
 			} else {
 				body = JSON.stringify(data);
 				headers = { 'Content-Type': 'application/json' };
