@@ -48,7 +48,7 @@ const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) =>
           </p>
           <div className='w-full flex items-center justify-start gap-4'>
             <CartButton productId={product._id} />
-            <BuyNowButton />
+            <BuyNowButton productId={product._id} />
           </div>
         </div>
       </div>

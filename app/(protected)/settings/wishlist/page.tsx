@@ -6,13 +6,16 @@ import useUserStore from '@/store/userStore';
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 const WishList = () => {
   const [products, setProducts] = useState([]);
   const [isloading, setIsLoading] = useState(true);
-  const { _id, wishlist, addToWishlist, removeFromWishlist } = useUserStore();
+  const { _id, wishlist, addToWishlist, removeFromWishlist, cart, addToCart } = useUserStore();
+  const router = useRouter();
+  const [isProceeding, setIsProceeding] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -26,7 +29,19 @@ const WishList = () => {
     })();
   }, []);
 
-  const handleClick = async (productId: string) => {
+  const handleCheckout = async (productId: string) => {
+    setIsProceeding(true);
+    // Add to cart
+    if (!cart.find((item) => item.productId === productId)) {
+      addToCart(productId, 1);
+      await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart: useUserStore.getState().cart } });
+    }
+    setIsProceeding(false);
+    router.push('/settings/cart');
+  };
+
+  const handleRemoveWishlist = async (productId: string) => {
+    if (isProceeding) return;
     removeFromWishlist(productId);
     toast.promise(
       async () => {
@@ -79,8 +94,13 @@ const WishList = () => {
                 <p className='w-[20ch] text-base line-clamp-2'>{currentPrdt.name}</p>
               </div>
               <div className='flex items-center justify-start gap-8'>
-                <button className='px-4 py-2 bg-orange-500 text-white'>Checkout</button>
-                <Trash2 className='size-6 text-neutral-500 hover:scale-105 hover:text-red-500 duration-300 cursor-pointer' onClick={() => handleClick(currentPrdt._id)} />
+                <button className={`px-4 py-2 bg-orange-500 text-white ${isProceeding && 'opacity-50'}`} onClick={() => handleCheckout(currentPrdt._id)} disabled={isProceeding}>
+                  Checkout
+                </button>
+                <Trash2
+                  className={`size-6 text-neutral-500 hover:scale-105 hover:text-red-500 duration-300 cursor-pointer ${isProceeding && 'opacity-50'}`}
+                  onClick={() => handleRemoveWishlist(currentPrdt._id)}
+                />
               </div>
             </div>
           )
