@@ -14,9 +14,7 @@ const CartButton = ({ productId }: { productId: string }) => {
     addToCart(productId, 1);
     toast.promise(
       async () => {
-        const formData = new FormData();
-        formData.append('cart', JSON.stringify(cart));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart: useUserStore.getState().cart } });
       },
       {
         loading: 'Adding to cart...',
@@ -24,6 +22,7 @@ const CartButton = ({ productId }: { productId: string }) => {
         error: 'Failed to add to cart',
       },
       {
+        id: 'cart',
         position: 'bottom-right',
       }
     );
@@ -33,9 +32,7 @@ const CartButton = ({ productId }: { productId: string }) => {
     reduceFromCart(productId);
     toast.promise(
       async () => {
-        const formData = new FormData();
-        formData.append('cart', JSON.stringify(cart));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: formData });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart: useUserStore.getState().cart } });
       },
       {
         loading: 'Removing from cart...',
@@ -43,6 +40,7 @@ const CartButton = ({ productId }: { productId: string }) => {
         error: 'Failed to remove from cart',
       },
       {
+        id: 'cart',
         position: 'bottom-right',
       }
     );

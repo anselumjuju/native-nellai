@@ -7,11 +7,12 @@ import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const WishList = () => {
   const [products, setProducts] = useState([]);
   const [isloading, setIsLoading] = useState(true);
-  const { wishlist, removeFromWishlist } = useUserStore();
+  const { _id, wishlist, addToWishlist, removeFromWishlist } = useUserStore();
 
   useEffect(() => {
     (async () => {
@@ -24,6 +25,27 @@ const WishList = () => {
       setIsLoading(false);
     })();
   }, []);
+
+  const handleClick = async (productId: string) => {
+    removeFromWishlist(productId);
+    toast.promise(
+      async () => {
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { wishlist: useUserStore.getState().wishlist } });
+      },
+      {
+        loading: 'Updating wishlist...',
+        success: 'Wishlist updated',
+        error: () => {
+          addToWishlist(productId);
+          return 'Failed to update wishlist';
+        },
+      },
+      {
+        id: 'wishlist',
+        position: 'bottom-right',
+      }
+    );
+  };
 
   if (isloading) return <div>Loading...</div>;
   if (!wishlist.length) {
@@ -58,7 +80,7 @@ const WishList = () => {
               </div>
               <div className='flex items-center justify-start gap-8'>
                 <button className='px-4 py-2 bg-orange-500 text-white'>Checkout</button>
-                <Trash2 className='size-6 text-neutral-500 hover:scale-105 hover:text-red-500 duration-300 cursor-pointer' onClick={() => removeFromWishlist(item)} />
+                <Trash2 className='size-6 text-neutral-500 hover:scale-105 hover:text-red-500 duration-300 cursor-pointer' onClick={() => handleClick(currentPrdt._id)} />
               </div>
             </div>
           )

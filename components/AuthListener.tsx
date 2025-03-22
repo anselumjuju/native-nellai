@@ -25,11 +25,11 @@ const AuthListener = () => {
             phone: userData?.phone,
             profilePic: userData?.profilePic,
             role: userData?.role,
-            address: userData?.address !== undefined ? JSON.parse(userData?.address) : undefined,
-            cart: userData?.cart !== undefined ? JSON.parse(userData?.cart) : undefined,
-            wishlist: userData?.wishlist !== undefined ? JSON.parse(userData?.wishlist) : undefined,
-            orders: userData?.orders !== undefined ? JSON.parse(userData?.orders) : undefined,
-            searchHistory: userData?.searchHistory !== undefined ? JSON.parse(userData?.searchHistory) : undefined,
+            address: userData?.address,
+            cart: userData?.cart,
+            wishlist: userData?.wishlist,
+            orders: userData?.orders,
+            searchHistory: userData?.searchHistory,
           });
         } catch (error) {
           console.error('Error fetching user data:', error);

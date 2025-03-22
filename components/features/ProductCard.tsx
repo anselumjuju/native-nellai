@@ -30,14 +30,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
     toast.promise(
       async () => {
-        const formData = new FormData();
-        formData.append('cart', JSON.stringify(wishlist));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { wishlist } });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { wishlist: useUserStore.getState().wishlist } });
       },
       {
         loading: 'Updating wishlist...',
         success: 'Wishlist updated',
-        error: 'Failed to update to wishlist',
+        error: () => {
+          if (wishlist.includes(productId)) {
+            removeFromWishlist(productId);
+          } else {
+            addToWishlist(productId);
+          }
+          return 'Failed to update wishlist';
+        },
       },
       {
         id: 'wishlist',

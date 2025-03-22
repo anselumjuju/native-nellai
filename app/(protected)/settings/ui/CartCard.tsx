@@ -15,9 +15,7 @@ const CartCard = ({ mainImage, name, price, quantity, productId }: { mainImage: 
     addToCart(productId, 1);
     toast.promise(
       async () => {
-        const formData = new FormData();
-        formData.append('cart', JSON.stringify(cart));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart } });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart: useUserStore.getState().cart } });
       },
       {
         loading: 'Adding to cart...',
@@ -35,9 +33,7 @@ const CartCard = ({ mainImage, name, price, quantity, productId }: { mainImage: 
     reduceFromCart(productId);
     toast.promise(
       async () => {
-        const formData = new FormData();
-        formData.append('cart', JSON.stringify(cart));
-        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart } });
+        await handleRequest({ endpoint: 'users', method: 'PATCH', id: _id, data: { cart: useUserStore.getState().cart } });
       },
       {
         loading: 'Removing from cart...',

@@ -47,7 +47,7 @@ const Setup = () => {
   const [isInitializing, setIsInitializing] = useState(true);
 
   const { uid } = useAuthStore();
-  const { _id, name, email, phone, address, profilePic, setUser } = useUserStore();
+  const { _id, name, email, phone, address, profilePic, setUser } = useUserStore.getState();
 
   const router = useRouter();
   const {
@@ -109,7 +109,7 @@ const Setup = () => {
   };
 
   return (
-    <div className='w-full max-w-screen-xl mx-auto h-dvh px-4 py-8'>
+    <div className='w-full max-w-screen-xl mx-auto min-h-dvh px-4 py-8'>
       {isInitializing ? (
         <div className='size-full flex items-center justify-center'>
           <h1>Fetching user details</h1>
