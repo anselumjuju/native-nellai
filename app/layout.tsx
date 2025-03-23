@@ -34,7 +34,7 @@ export default async function RootLayout({
           <Header />
         </div>
         <div className='min-h-[100vh]'>{children}</div>
-        {!pathname.includes('/admin') && (
+        {!pathname.includes('admin') && (
           <div className='w-full bg-neutral-900 text-white'>
             <Footer />
           </div>

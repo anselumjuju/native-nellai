@@ -8,188 +8,180 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { handleRequest } from '@/lib/serverActions';
 
-const timestamps = [
-  '2025-02-19T08:42:13.822+00:00',
-  '2025-02-19T12:15:45.200+00:00',
-  '2025-02-19T18:30:22.100+00:00',
-  '2025-02-18T09:10:05.500+00:00',
-  '2025-02-18T15:45:30.822+00:00',
-  '2025-02-17T07:20:11.822+00:00',
-  '2025-02-17T19:42:59.100+00:00',
-  '2025-02-16T10:32:48.000+00:00',
-  '2025-02-16T14:22:13.822+00:00',
-  '2025-02-15T05:50:30.100+00:00',
-  '2025-02-15T22:15:18.822+00:00',
-  '2025-02-14T13:05:45.500+00:00',
-  '2025-02-14T23:58:22.822+00:00',
-  '2025-02-13T16:20:59.822+00:00',
-  '2025-02-13T22:10:33.100+00:00',
-  '2025-02-12T08:30:22.822+00:00',
-  '2025-02-12T11:45:50.500+00:00',
-  '2025-02-11T09:15:11.822+00:00',
-  '2025-02-11T17:42:45.100+00:00',
-  '2025-02-10T14:32:30.822+00:00',
-  '2025-02-10T18:22:55.100+00:00',
-  '2025-02-09T10:10:05.822+00:00',
-  '2025-02-09T22:45:30.100+00:00',
-  '2025-02-08T06:50:45.822+00:00',
-  '2025-02-08T20:58:22.100+00:00',
-  '2025-02-07T12:15:10.822+00:00',
-  '2025-02-07T19:30:50.100+00:00',
-  '2025-02-06T15:42:22.822+00:00',
-  '2025-02-06T23:10:33.100+00:00',
-  '2025-02-05T11:05:45.822+00:00',
-];
+interface IOrder {
+  _id: string;
+  userId: string;
+  items: {
+    productId: string;
+    quantity: number;
+    _id: string;
+  }[];
+  totalPrice: number;
+  status: string;
+  paymentStatus: string;
+  orderId: string;
+  createdAt: string;
+}
 
-const orders = [
-  {
-    profilePic: 'https://placehold.co/400/png',
-    name: 'Michael Smith',
-    date: '2024-02-10',
-    total: '₹5,200.00',
-    status: 'Pending',
-  },
-  {
-    profilePic: 'https://placehold.co/400/png',
-    name: 'Alice Johnson',
-    date: '2024-02-15',
-    total: '₹8,750.00',
-    status: 'Shipped',
-  },
-  {
-    profilePic: 'https://placehold.co/400/png',
-    name: 'James Williams',
-    date: '2024-02-08',
-    total: '₹7,999.00',
-    status: 'Cancelled',
-  },
-  {
-    profilePic: 'https://placehold.co/400/png',
-    name: 'Emma Davis',
-    date: '2024-02-12',
-    total: '₹12,150.00',
-    status: 'Delivered',
-  },
-  {
-    profilePic: 'https://placehold.co/400/png',
-    name: 'Sophia Martinez',
-    date: '2024-02-18',
-    total: '₹6,450.00',
-    status: 'Shipped',
-  },
-];
+interface IUser {
+  _id: string;
+  uid: string;
+  name: string;
+  email: string;
+  phone: string;
+  profilePic: string;
+  role: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  wishlist: string[];
+  searchHistory: string[];
+  orders: string[];
+  cart: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface IProduct {
+  _id: string;
+  name: string;
+  mainImage: string;
+  caption: string;
+  description: string;
+  about: string;
+  quantity: string;
+  stock: string;
+  categoryId: string;
+  locationId: string;
+  originalPrice: number;
+  discountPrice: number;
+  isBanner: boolean;
+  reviews: string[];
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
 
 const statusOrder = ['Pending', 'Shipped', 'Delivered', 'Cancelled'];
 
-const products = [
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Wireless Bluetooth Headphones',
-    price: '₹2,499.00',
-    stock: 'Available',
-    orders: 320,
-    revenue: 799680,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Smartwatch Series 6',
-    price: '₹14,999.00',
-    stock: 'Unavailable',
-    orders: 150,
-    revenue: 2249850,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Gaming Mechanical Keyboard',
-    price: '₹3,750.00',
-    stock: 'Available',
-    orders: 180,
-    revenue: 675000,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: '4K Ultra HD Smart TV',
-    price: '₹39,999.00',
-    stock: 'Unavailable',
-    orders: 85,
-    revenue: 3399915,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Portable Bluetooth Speaker',
-    price: '₹1,899.00',
-    stock: 'Available',
-    orders: 275,
-    revenue: 522225,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Wireless Earbuds Pro',
-    price: '₹4,499.00',
-    stock: 'Available',
-    orders: 200,
-    revenue: 899800,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Laptop Backpack 15.6"',
-    price: '₹1,250.00',
-    stock: 'Unavailable',
-    orders: 95,
-    revenue: 118750,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Adjustable Office Chair',
-    price: '₹7,499.00',
-    stock: 'Available',
-    orders: 140,
-    revenue: 1049860,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'External 1TB SSD',
-    price: '₹9,999.00',
-    stock: 'Available',
-    orders: 175,
-    revenue: 1749825,
-  },
-  {
-    image: 'https://placehold.co/400/png',
-    name: 'Smartphone Tripod Stand',
-    price: '₹999.00',
-    stock: 'Unavailable',
-    orders: 110,
-    revenue: 109890,
-  },
-];
-
-const processChartData = (timestamps: string[]) => {
-  const counts: Record<string, number> = {};
-
-  timestamps.forEach((timestamp) => {
-    const date = new Date(timestamp).toISOString().split('T')[0];
-    counts[date] = (counts[date] || 0) + 1;
-  });
-
-  return Object.entries(counts).map(([date, count]) => ({
-    date,
-    desktop: count,
-  }));
-};
-
-const chartData = processChartData(timestamps);
-
-const salesChartConfig = {
-  desktop: {
-    label: 'Sales',
-    color: '#4F46E5',
-  },
-} satisfies ChartConfig;
-
 const Admin = () => {
   const router = useRouter();
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [orders, setOrders] = useState<IOrder[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [timeStamps, setTimeStamps] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
+      const { data: orders, success: orderSuccess } = await handleRequest({ endpoint: 'orders' });
+      const { data: users, success: userSuccess } = await handleRequest({ endpoint: 'users' });
+      if (!productSuccess || !orderSuccess || !userSuccess) {
+        return null;
+      }
+      setProducts(products);
+      setOrders(orders);
+      setUsers(users);
+      setTimeStamps(() => {
+        if (orders.length === 0) return [];
+
+        const latestOrderDate = new Date(Math.max(...orders.map((order: IOrder) => new Date(order.createdAt).getTime())));
+
+        const month = latestOrderDate.getMonth();
+        const year = latestOrderDate.getFullYear();
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const dateCounts: Record<string, number> = {};
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = new Date(year, month, day).toISOString().split('T')[0];
+          dateCounts[dateStr] = 1;
+        }
+
+        orders.forEach((order: IOrder) => {
+          const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
+          if (dateCounts[orderDate]) {
+            dateCounts[orderDate] += 1;
+          }
+        });
+
+        return Object.entries(dateCounts).flatMap(([date, count]) => Array(count).fill(date));
+      });
+      setIsLoading(false);
+    })();
+  }, []);
+
+  // Calculate chart data
+  const processChartData = (timestamps: string[]) => {
+    const counts: Record<string, number> = {};
+    timestamps.forEach((timestamp) => {
+      const date = new Date(timestamp).toISOString().split('T')[0];
+      counts[date] = (counts[date] || 0) + 1;
+    });
+    return Object.entries(counts).map(([date, count]) => ({
+      date,
+      desktop: count,
+    }));
+  };
+  const chartData = processChartData(timeStamps);
+  const salesChartConfig = {
+    desktop: {
+      label: 'Sales',
+      color: '#4F46E5',
+    },
+  } satisfies ChartConfig;
+
+  // Calculate sales data from orders
+  const productSales: Record<string, { orders: number; revenue: number }> = {};
+  orders.forEach((order) => {
+    order.items.forEach(({ productId, quantity }) => {
+      const product = products.find((p) => p._id === productId);
+      if (product) {
+        if (!productSales[productId]) {
+          productSales[productId] = { orders: 0, revenue: 0 };
+        }
+        productSales[productId].orders += quantity;
+        productSales[productId].revenue += quantity * (product.discountPrice || product.originalPrice);
+      }
+    });
+  });
+  const sortedProducts = products
+    .map((product) => ({
+      ...product,
+      orders: productSales[product._id]?.orders || 0,
+      revenue: productSales[product._id]?.revenue || 0,
+    }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  const newUsersThisMonth = users.filter((user) => {
+    const createdAt = new Date(user.createdAt);
+    return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear;
+  });
+  const newOrdersThisMonth = orders.filter((order) => {
+    const createdAt = new Date(order.createdAt);
+    return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear;
+  });
+  const revenueThisMonth = newOrdersThisMonth.reduce((total, order) => total + (order.totalPrice || 0), 0);
+
+  if (isLoading) {
+    return (
+      <div className='w-full h-[90vh] flex flex-col items-center justify-center gap-4'>
+        <p>Loading</p>
+      </div>
+    );
+  }
 
   return (
     <div className='size-full max-w-screen-2xl mx-auto py-20 px-3 space-y-12'>
@@ -200,27 +192,27 @@ const Admin = () => {
           {[
             {
               title: 'Total Users',
-              value: '0 Users',
+              value: `${users.length} Users`,
               icon: <Users className='size-5' />,
-              caption: 'No new users this month',
+              caption: newUsersThisMonth.length > 0 ? `${newUsersThisMonth.length} new users this month` : 'No new users this month',
             },
             {
               title: 'Total Orders',
-              value: '0 Orders',
+              value: `${orders.length} Orders`,
               icon: <Package className='size-5' />,
-              caption: 'No new orders this month',
+              caption: newOrdersThisMonth.length > 0 ? `${newOrdersThisMonth.length} new orders this month` : 'No new orders this month',
             },
             {
               title: 'Total Revenue',
-              value: '₹0.00',
+              value: `₹${orders.reduce((total, order) => total + (order.totalPrice || 0), 0).toLocaleString()}`,
               icon: <DollarSign className='size-5' />,
-              caption: 'No revenue generated yet',
+              caption: revenueThisMonth > 0 ? `₹${revenueThisMonth.toLocaleString()} generated this month` : 'No revenue generated this month',
             },
             {
-              title: 'Total Earnings',
-              value: '₹0.00',
+              title: 'Total Products',
+              value: `${products.length} Products`,
               icon: <ShoppingBag className='size-5' />,
-              caption: 'No earnings generated yet',
+              caption: 'Your products are ready for sales!',
             },
           ].map((item, idx) => (
             <div
@@ -242,12 +234,12 @@ const Admin = () => {
       {/* Sales Chart */}
       <div className='space-y-6'>
         <h1 className='text-2xl'>Sales</h1>
-        <ChartContainer config={salesChartConfig} className='w-full h-[250px] lg:h-[400px] p-2 py-3 border rounded-lg'>
+        <ChartContainer config={salesChartConfig} className='w-full h-[250px] lg:h-[450px] p-2 py-3 border rounded-lg'>
           <AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey='date' axisLine={false} tickLine={false} tickMargin={8} tickFormatter={(date) => new Date(date).getDate().toString()} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Area dataKey={'desktop'} type={'natural'} stroke='#4F46E5' fill='#4F46E5' fillOpacity={0.2} fillRule='nonzero' />
+            <Area dataKey={'desktop'} type={'linear'} stroke='#4F46E5' fill='#4F46E5' fillOpacity={0.2} fillRule='nonzero' className='bg-purple-500' />
           </AreaChart>
         </ChartContainer>
       </div>
@@ -271,14 +263,12 @@ const Admin = () => {
                 {orders
                   .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status))
                   .map((order, index) => (
-                    <>
-                      <TableRow key={index} className='*:py-4'>
-                        <TableCell className='font-medium'>{order.name}</TableCell>
-                        <TableCell className='text-right'>{format(new Date(order.date), 'MMM dd, yyyy')}</TableCell>
-                        <TableCell className='text-right'>{order.total}</TableCell>
-                        <TableCell className='text-right'>{order.status}</TableCell>
-                      </TableRow>
-                    </>
+                    <TableRow key={index} className='*:py-4' onClick={() => router.push('/admin/orders')}>
+                      <TableCell className='cursor-pointer font-medium'>{users.find((user) => user._id === order.userId)?.name}</TableCell>
+                      <TableCell className='cursor-pointer text-right'>{format(new Date(order.createdAt), 'PP')}</TableCell>
+                      <TableCell className='cursor-pointer text-right'>{order.totalPrice}</TableCell>
+                      <TableCell className='cursor-pointer text-right capitalize'>{order.status}</TableCell>
+                    </TableRow>
                   ))}
               </TableBody>
             </Table>
@@ -299,12 +289,12 @@ const Admin = () => {
               </TableHeader>
               <TableBody>
                 {products
-                  .sort((a) => (a.stock === 'Unavailable' ? -1 : 1))
+                  .sort((a) => (a.stock === 'unavailable' ? -1 : 1))
                   .map((product, index) => (
                     <TableRow key={index} className='*:py-4'>
                       <TableCell className='flex items-center gap-3'>{product.name}</TableCell>
-                      <TableCell className='text-right'>{product.price}</TableCell>
-                      <TableCell className={`text-sm text-right ${product.stock === 'Unavailable' ? 'text-destructive' : ''}`}>{product.stock}</TableCell>
+                      <TableCell className='text-right'>{product.discountPrice || product.originalPrice}</TableCell>
+                      <TableCell className={`text-sm text-right capitalize ${product.stock === 'unavailable' ? 'text-destructive' : ''}`}>{product.stock}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>
@@ -361,12 +351,12 @@ const Admin = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products
-                  .sort((a, b) => b.revenue - a.revenue)
-                  .map((product, index) => (
-                    <TableRow key={index} className='*:py-4'>
+                {sortedProducts
+                  .filter((product) => product.orders > 0)
+                  .map((product) => (
+                    <TableRow key={product._id} className='*:py-4'>
                       <TableCell className='flex items-center gap-3'>
-                        <Image src={product.image} alt={product.name} className='w-10 h-10 rounded-md' width={40} height={40} />
+                        <Image src={product.mainImage} alt={product.name} className='w-10 h-10 rounded-md' width={40} height={40} />
                         {product.name}
                       </TableCell>
                       <TableCell className='text-right'>{product.orders}</TableCell>
@@ -378,7 +368,6 @@ const Admin = () => {
           </div>
         </div>
       </div>
-      {/* Recent Product Reviews */}
     </div>
   );
 };
