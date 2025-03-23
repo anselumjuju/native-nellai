@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ChartBarStacked, Command, LayoutDashboard, MapPin, MessageCircle, Package, PackagePlus, Users } from 'lucide-react';
+import { ChartBarStacked, Command, LayoutDashboard, MapPin, Package, PackagePlus, Users } from 'lucide-react';
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ const data = {
     { name: 'Categories', url: '/admin/categories', icon: ChartBarStacked },
     { name: 'Locations', url: '/admin/locations', icon: MapPin },
     { name: 'Users', url: '/admin/users', icon: Users },
-    { name: 'Reviews', url: '/admin/reviews', icon: MessageCircle },
+    // { name: 'Reviews', url: '/admin/reviews', icon: MessageCircle },
     { name: 'Orders', url: '/admin/orders', icon: PackagePlus },
   ],
 };
