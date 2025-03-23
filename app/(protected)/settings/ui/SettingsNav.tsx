@@ -19,7 +19,7 @@ const SettingsNav = () => {
           <DropdownMenuTrigger asChild>
             <Button variant={'outline'} className='w-full text-right flex items-center justify-start relative capitalize' size={'lg'}>
               {path.includes('/settings/') ? path.replace('/settings/', '') : 'profile'}
-              <ArrowDown className='size-6 text-xs absolute right-2 scale-75 text-muted-foreground' />
+              <ArrowDown className='size-6 text-xs absolute right-2 scale-75 text-primary' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className={`min-w-[calc(100vw-24px-24px)]`}>
@@ -35,7 +35,7 @@ const SettingsNav = () => {
       </div>
 
       {/* Nav for Tablets */}
-      <div className='min-w-60 w-auto hidden sm:flex flex-col items-start justify-start relative after:content-[""] after:absolute after:w-0.5 after:h-[200%] after:bg-muted-foreground/30 after:right-5 after:rounded-full'>
+      <div className='min-w-40 md:min-w-60 w-auto hidden sm:flex flex-col items-start justify-start relative after:content-[""] after:absolute after:w-0.5 after:h-[200%] after:bg-muted-foreground/30 after:right-5 after:rounded-full'>
         {['profile', 'cart', 'wishlist', 'orders'].map((item) => (
           <NavLink
             to={item === 'profile' ? `/settings` : `/settings/${item}`}

@@ -9,7 +9,7 @@ import { uploadImage } from '@/lib/uploadImage';
 import useAuthStore from '@/store/authStore';
 import useUserStore from '@/store/userStore';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, UserRound } from 'lucide-react';
+import { Pencil, Trash2, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -125,16 +125,20 @@ const EditProfile = () => {
                   </div>
                 )}
               </div>
-              <div>
-                <Button onClick={handleButtonClick} aria-haspopup='dialog' variant={'outline'} size={'lg'} className=''>
+              <div className='flex items-end justify-start gap-4'>
+                <Button onClick={handleButtonClick} aria-haspopup='dialog' variant={'outline'} size={'lg'} className='px-3 md:px-6'>
                   <Pencil className='mr-2 size-4' />
-                  Upload new picture
+                  <span className='hidden md:inline'>Upload new picture</span>
+                  <span className='md:hidden'>Edit Profile</span>
                 </Button>
                 <input type='file' ref={fileInputRef} onChange={handleFileChange} className='hidden' accept='image/*' />
+                <Button disabled={isSubmitting} variant={'secondary'} size={'lg'} onClick={() => setPreviewUrl(null)} className='hidden md:block'>
+                  Delete
+                </Button>
+                <Button disabled={isSubmitting} variant={'secondary'} size={'icon'} onClick={() => setPreviewUrl(null)} className='md:hidden'>
+                  <Trash2 className='size-4' />
+                </Button>
               </div>
-              <Button disabled={isSubmitting} variant={'secondary'} size={'lg'} onClick={() => setPreviewUrl(null)}>
-                Delete
-              </Button>
             </div>
 
             {/* Profile Details */}
