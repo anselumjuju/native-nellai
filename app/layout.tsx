@@ -46,7 +46,6 @@ export const metadata: Metadata = {
   },
   authors: [{ name: 'R10S Digital Solutions' }],
   creator: 'R10S Digital Solutions',
-  themeColor: '#ffffff',
 };
 
 export default async function RootLayout({
