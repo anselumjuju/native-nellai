@@ -5,20 +5,17 @@ import { Button } from '@/components/ui/button';
 import useUserStore from '@/store/userStore';
 import Sidebar from '@/components/layout/Sidebar';
 import { ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 
 const Header = () => {
   const { role, cart } = useUserStore();
 
   return (
-    <header className='w-full max-w-screen-2xl mx-auto py-4 flex items-center justify-between'>
-      <div className='flex items-end justify-start cursor-pointer'>
-        <p className='text-4xl font-bold text-[#ea580c] leading-[0.8]'>N</p>
-        <div className='flex flex-col gap-0 *:leading-none text-sm'>
-          <p>ative</p>
-          <p>ellai</p>
-        </div>
-      </div>
-      <nav className='hidden lg:flex items-center gap-8 *:text-foreground'>
+    <header className='w-full max-w-screen-2xl mx-auto py-4 flex items-center justify-between gap-4'>
+      <Link href={'/'} className='w-max h-12'>
+        <Image src={'/images/logo-v.webp'} alt='logo' width={100} height={100} className='w-max h-full object-cover' unoptimized priority />
+      </Link>
+      <nav className='hidden lg:flex items-center gap-4 *:text-foreground'>
         {[
           { link: '/', name: 'Home' },
           { link: '/products', name: 'Products' },

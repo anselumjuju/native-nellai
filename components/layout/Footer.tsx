@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 const Footer = () => {
@@ -5,13 +6,9 @@ const Footer = () => {
     <div className='w-full h-full max-w-screen-2xl mx-auto px-3 md:px-5 py-16 flex flex-wrap items-start justify-between gap-12 bg-neutral-900 text-white'>
       {/* Logo and name */}
       <div className='flex flex-col items-start justify-center gap-4'>
-        <div className='flex items-end justify-start cursor-pointer'>
-          <p className='text-4xl font-bold text-[#ea580c] leading-[0.8]'>N</p>
-          <div className='flex flex-col gap-0 *:leading-none text-sm'>
-            <p>ative</p>
-            <p>ellai</p>
-          </div>
-        </div>
+        <Link href={'/'} className='w-max h-12'>
+          <Image src={'/images/logo-v.webp'} alt='logo' width={100} height={100} className='w-max h-full object-cover' unoptimized priority />
+        </Link>
         <p className='w-[40ch] text-sm text-muted-foreground'>
           Discover authentic traditional and local products from Nellai, a region rich in history, culture and natural resources, and experience the best of South India.
         </p>

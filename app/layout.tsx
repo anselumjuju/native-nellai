@@ -15,6 +15,38 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: 'Native Nellai',
   description: 'Discover authentic traditional and local products from Nellai.',
+  keywords: ['Native Nellai', 'Traditional Products', 'Nellai', 'Tirunelveli', 'Indian Culture', 'Local Products'],
+  metadataBase: new URL('https://native-nellai.vercel.app/'),
+  openGraph: {
+    title: 'Native Nellai',
+    description: 'Discover authentic traditional and local products from Nellai.',
+    url: 'https://native-nellai.vercel.app/',
+    siteName: 'Native Nellai',
+    images: [
+      {
+        url: '/images/banner.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Native Nellai Banner',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Native Nellai',
+    description: 'Discover authentic traditional and local products from Nellai.',
+    images: ['/images/banner.webp'],
+  },
+  icons: {
+    icon: '/images/logo.webp',
+    shortcut: '/images/logo.webp',
+    apple: '/images/logo.webp',
+  },
+  authors: [{ name: 'R10S Digital Solutions' }],
+  creator: 'R10S Digital Solutions',
+  themeColor: '#ffffff',
 };
 
 export default async function RootLayout({
