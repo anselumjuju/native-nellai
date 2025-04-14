@@ -69,7 +69,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <p className='w-full py-1 text-xs text-muted-foreground truncate'>{product.caption}</p>
       </div>
       <div className='py-2 flex items-center justify-between w-full'>
-        <p>&#8377; {product.originalPrice}</p>
+        <p>&#8377; {product.discountPrice || product.originalPrice}</p>
         <Link href={`/products/${product.slug}`} className='px-5 py-1.5 bg-orange-400 text-white rounded-lg text-sm'>
           Buy Now
         </Link>

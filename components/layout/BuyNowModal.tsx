@@ -90,7 +90,9 @@ const BuyNowModal = ({
                     <div className='justify-self-end'>
                       <p className='text-sm text-right'>&#8377;&nbsp;{(currentPrdt.discountPrice || currentPrdt.originalPrice) * item.quantity}</p>
                       {currentPrdt.discountPrice ? (
-                        <p className='w-full text-xs text-right text-nowrap text-green-500'>You save: &#8377;&nbsp;{currentPrdt.originalPrice - currentPrdt.discountPrice}</p>
+                        <p className='w-full text-xs text-right text-nowrap text-green-500'>
+                          You save: &#8377;&nbsp;{(currentPrdt.originalPrice - currentPrdt.discountPrice) * item.quantity}
+                        </p>
                       ) : null}
                     </div>
                   </div>
