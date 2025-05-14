@@ -1,6 +1,6 @@
 'use client';
 
-import { ChartColumnStacked, Heart, LayoutDashboard, MapPinHouse, Menu, Package, PackageOpen, ShoppingCart, UserPen, X } from 'lucide-react';
+import { ChartColumnStacked, Heart, House, LayoutDashboard, MapPinHouse, Menu, Package, PackageOpen, PanelRightClose, ShoppingCart, UserPen, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
@@ -12,12 +12,14 @@ import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import path from 'path';
 
 const Sidebar = () => {
   const { name, profilePic, role } = useUserStore();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const pathName = usePathname();
 
   const handleSignOut = async () => {
     try {
@@ -28,6 +30,52 @@ const Sidebar = () => {
     }
   };
 
+  const mainNavLinks = [
+    {
+      icon: House,
+      text: 'Home',
+      url: '/',
+    },
+    {
+      icon: Package,
+      text: 'Products',
+      url: '/products',
+    },
+    {
+      icon: ChartColumnStacked,
+      text: 'Categories',
+      url: '/categories',
+    },
+    {
+      icon: MapPinHouse,
+      text: 'Locations',
+      url: '/locations',
+    },
+  ];
+
+  const accountNavLink = [
+    {
+      icon: UserPen,
+      text: 'My Profile',
+      url: '/settings',
+    },
+    {
+      icon: ShoppingCart,
+      text: 'Cart',
+      url: '/settings/cart',
+    },
+    {
+      icon: Heart,
+      text: 'Wishlist',
+      url: '/settings/wishlist',
+    },
+    {
+      icon: PackageOpen,
+      text: 'Orders',
+      url: '/settings/orders',
+    },
+  ];
+
   return (
     <Drawer direction='right' handleOnly={false} setBackgroundColorOnScale>
       <DrawerTrigger asChild>
@@ -35,87 +83,73 @@ const Sidebar = () => {
           <Menu />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className='w-2/3 md:w-1/2 max-w-[300px] h-dvh ml-auto rounded-none'>
+      <DrawerContent className='w-2/3 md:w-1/2 max-w-[350px] h-dvh ml-auto rounded-none'>
         <DrawerTitle className='sr-only'>Menu</DrawerTitle>
         <DrawerDescription className='h-full'>
-          <div className='w-full py-6 px-2 h-full flex flex-col justify-start gap-4'>
-            <DrawerClose className='mb-3 px-5 flex items-end justify-end cursor-pointer'>
-              <X />
-            </DrawerClose>
+          <div className='w-full py-8 px-4 h-full flex flex-col justify-start'>
+            <div className='w-full mb-3 flex items-center justify-between'>
+              <Link href={'/'} className='flex items-center gap-2'>
+                <img src='/images/logo.webp' alt='NativeNellai' width={100} height={100} className='w-8 h-full object-cover' />
+                <p className='text-lg font-medium text-neutral-950'>nativenellai.com</p>
+              </Link>
+              <DrawerClose className='cursor-pointer'>
+                <PanelRightClose />
+              </DrawerClose>
+            </div>
 
-            <div className='flex flex-col items-start justify-start gap-4 lg:hidden'>
-              {[
-                {
-                  icon: Package,
-                  text: 'Products',
-                  url: '/products',
-                },
-                {
-                  icon: ChartColumnStacked,
-                  text: 'Categories',
-                  url: '/categories',
-                },
-                {
-                  icon: MapPinHouse,
-                  text: 'Locations',
-                  url: '/locations',
-                },
-              ].map((item, index) => {
+            <Separator className='my-5 bg-neutral-200 lg:hidden' />
+
+            <div className='flex flex-col items-start justify-start lg:hidden'>
+              {mainNavLinks.map((item, index) => {
                 const Icon: any = item.icon;
                 return (
-                  <DrawerClose key={index} asChild>
-                    <Link href={item.url} className='flex items-center gap-3 cursor-pointer'>
-                      <Icon className='size-4' />
-                      <p className='text-base text-neutral-950'>{item.text}</p>
+                  <DrawerClose key={index} asChild className={`w-full pl-4 py-4`}>
+                    <Link
+                      href={item.url}
+                      className={`flex items-center gap-4 cursor-pointer rounded-md hover:bg-[#fdfff1] hover:scale-[101%] transition-all duration-200 ${
+                        pathName === item.url ? 'bg-[#f9ffe1] text-neutral-800 font-semibold' : ''
+                      }`}>
+                      <Icon className='size-7' strokeWidth={1} />
+                      <p className={`text-base font-normal`}>{item.text}</p>
                     </Link>
                   </DrawerClose>
                 );
               })}
-              <Separator />
             </div>
 
-            <div className='flex flex-col items-start justify-start gap-4'>
-              {[
-                {
-                  icon: UserPen,
-                  text: 'My Profile',
-                  url: '/settings',
-                },
-                {
-                  icon: ShoppingCart,
-                  text: 'Cart',
-                  url: '/settings/cart',
-                },
-                {
-                  icon: Heart,
-                  text: 'Wishlist',
-                  url: '/settings/wishlist',
-                },
-                {
-                  icon: PackageOpen,
-                  text: 'Orders',
-                  url: '/settings/orders',
-                },
-              ].map((item, index) => {
+            <Separator className='my-5 bg-neutral-200' />
+
+            <div className='flex flex-col items-start justify-start'>
+              <p className='text-orange-500 text-sm font-semibold tracking-wider uppercase'>Dashboard</p>
+              {accountNavLink.map((item, index) => {
                 const Icon: any = item.icon;
                 return (
-                  <DrawerClose key={index} asChild>
-                    <Link href={isAuthenticated ? item.url : '/login'} className='flex items-center gap-3 cursor-pointer'>
-                      <Icon className='size-4' />
-                      <p className='text-base text-neutral-950'>{item.text}</p>
+                  <DrawerClose key={index} asChild className={`w-full pl-4 py-4`}>
+                    <Link
+                      href={item.url}
+                      className={`flex items-center gap-4 cursor-pointer rounded-md hover:bg-[#fdfff1] hover:scale-[101%] transition-all duration-200 ${
+                        pathName === item.url ? 'bg-[#f9ffe1] text-neutral-800 font-semibold' : ''
+                      }`}>
+                      <Icon className='size-7' strokeWidth={1} />
+                      <p className={`text-base`}>{item.text}</p>
                     </Link>
                   </DrawerClose>
                 );
               })}
               {role === 'admin' && (
-                <DrawerClose asChild>
-                  <Link href='/admin' className='flex items-center gap-3 cursor-pointer'>
-                    <LayoutDashboard className='size-4' />
-                    <p className='text-base text-neutral-950'>Dashboard</p>
+                <DrawerClose asChild className={`w-full pl-4 py-4`}>
+                  <Link
+                    href={'/admin'}
+                    className={`flex items-center gap-4 cursor-pointer rounded-md hover:bg-[#fdfff1] hover:scale-[101%] transition-all duration-200 ${
+                      pathName === '/admin' ? 'bg-[#f9ffe1] text-neutral-800 font-semibold' : ''
+                    }`}>
+                    <LayoutDashboard className='size-7' strokeWidth={1} />
+                    <p className={`text-base ${pathName === '/admin' ? 'bg-[#fbffea] text-[#f0ffb2] font-semibold' : ''}`}>Dashboard</p>
                   </Link>
                 </DrawerClose>
               )}
-              <Separator />
+
+              <Separator className='my-5 bg-neutral-200' />
             </div>
 
             <DrawerFooter className='p-0'>
