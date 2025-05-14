@@ -78,10 +78,8 @@ const Sidebar = () => {
 
   return (
     <Drawer direction='right' handleOnly={false} setBackgroundColorOnScale>
-      <DrawerTrigger asChild>
-        <Button variant='ghost'>
-          <Menu />
-        </Button>
+      <DrawerTrigger asChild className='ml-0 cursor-pointer'>
+        <Menu />
       </DrawerTrigger>
       <DrawerContent className='w-2/3 md:w-1/2 max-w-[350px] h-dvh ml-auto rounded-none'>
         <DrawerTitle className='sr-only'>Menu</DrawerTitle>
