@@ -14,7 +14,7 @@ const Illustration3 = () => {
             <p className='text-sm'>
               Discover native groceries, crafted with care and offered at honest <span className='text-nowrap'>prices-your</span> ultimate destination for quality.
             </p>
-            <PrimaryButton text={'Explore Now'} className='w-max text-white' />
+            <PrimaryButton text={'Explore Now'} className='w-max text-white' link='/products' />
           </div>
 
           <Image src={'/svg/earth.svg'} alt='product' width={400} height={400} className='w-[400px] lg:w-[500px] mx-auto object-cover self-end' />

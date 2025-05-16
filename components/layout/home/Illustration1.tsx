@@ -19,7 +19,7 @@ const Illustration1 = () => {
             We bring you groceries that reflect Nellai&apos;s native <span className='text-nowrap'>spirit-pure</span>, unprocessed, and sourced with integrity from trusted local
             makers.
           </p>
-          <PrimaryButton text={'Explore Now'} className='w-max mt-5 md:mt-3' />
+          <PrimaryButton text={'Explore Now'} className='w-max mt-5 md:mt-3' link={'/products'} />
         </div>
 
         {/* Bg */}
