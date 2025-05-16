@@ -1,15 +1,23 @@
-import Featured from '@/components/layout/Featured';
-import HeaderSlider from '@/components/layout/HeaderSlider';
-import Hero from '@/components/layout/Hero';
-import Locations from '@/components/layout/Locations';
+import BestSeller from '@/components/layout/home/BestSeller';
+import Categories from '@/components/layout/home/Categories';
+import Illustration1 from '@/components/layout/home/Illustration1';
+import Illustration2 from '@/components/layout/home/Illustration2';
+import Illustration3 from '@/components/layout/home/Illustration3';
+import Locations from '@/components/layout/home/Locations';
+import TodaysBest from '@/components/layout/home/TodaysBest';
 
 export default async function Home() {
   return (
-    <div className='w-full max-w-screen-xl px-3 md:px-5 py-10 mx-auto space-y-20'>
-      <HeaderSlider />
-      <Hero />
+    <div className='w-full space-y-20 py-10'>
+      <div className='bg-gradient-to-b from-[#FFFFFF] to-[#fbffea] space-y-20'>
+        <Illustration1 />
+        <Categories />
+        <BestSeller />
+        <Illustration2 />
+      </div>
+      <TodaysBest />
       <Locations />
-      <Featured />
+      <Illustration3 />
     </div>
   );
 }

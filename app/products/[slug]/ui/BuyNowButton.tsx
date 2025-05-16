@@ -21,7 +21,7 @@ const BuyNowButton = ({ productId }: { productId: string }) => {
   };
 
   return (
-    <button className={`px-12 py-3 bg-orange-400 text-white text-sm ${isProceeding && 'opacity-50'}`} onClick={handleBuyNow} disabled={isProceeding}>
+    <button className={`px-12 py-3 bg-orange-500 text-white text-sm ${isProceeding && 'opacity-50'}`} onClick={handleBuyNow} disabled={isProceeding}>
       {isProceeding ? 'Proceeding...' : 'Buy Now'}
     </button>
   );

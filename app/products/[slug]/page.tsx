@@ -55,7 +55,7 @@ const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) =>
       <div className='space-y-12'>
         {/* Similar products */}
         <div className='w-full flex flex-col items-start justify-center gap-12'>
-          <h1 className='text-3xl font-medium  relative after:content-[""] after:h-0.5 after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-400'>
+          <h1 className='text-3xl font-medium  relative after:content-[""] after:h-0.5 after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-500'>
             Similar Products
           </h1>
           <div className='w-full h-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8'>
@@ -71,7 +71,7 @@ const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) =>
         </div>
         {/* More from this location */}
         <div className='w-full flex flex-col items-start justify-center gap-12'>
-          <h1 className='text-3xl font-medium  relative after:content-[""] after:h-0.5 after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-400'>
+          <h1 className='text-3xl font-medium  relative after:content-[""] after:h-0.5 after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-500'>
             Local Product Picks
           </h1>
           <div className='w-full h-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8'>

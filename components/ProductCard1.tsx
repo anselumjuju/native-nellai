@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
-interface ProductCardProps {
+interface ProductCard1Props {
   product: {
     _id: string;
     name: string;
@@ -19,7 +19,7 @@ interface ProductCardProps {
   };
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard1 = ({ product }: ProductCard1Props) => {
   const { _id, wishlist, addToWishlist, removeFromWishlist } = useUserStore();
 
   const handleClick = async (productId: string) => {
@@ -52,25 +52,24 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className='w-48 sm:w-64 h-full mx-auto flex flex-col items-start justify-between gap-0.5 rounded-lg overflow-hidden relative group'>
-      <Heart
-        className={`size-6 absolute top-2 right-2 text-red-500 stroke-1 scale-0 group-hover:scale-100 duration-100 ${wishlist.includes(product._id) ? 'fill-red-500' : ''}`}
-        onClick={() => handleClick(product._id)}
-      />
-      <div className='w-full aspect-square rounded-lg overflow-clip bg-neutral-100'>
-        <Link href={`/products/${product.slug}`} className='w-full h-full flex items-center justify-center'>
-          <Image src={product.mainImage} alt={product.name} width={400} height={400} className='w-[80%] aspect-square object-cover hover:scale-110 duration-500' priority />
-        </Link>
+    <div className='w-72 h-full p-2 flex flex-col items-start justify-start gap-3 rounded-lg overflow-hidden relative border'>
+      <div className='w-full flex items-center justify-between'>
+        <p className='px-3 py-1.5 bg-[#156c56] text-white rounded-lg text-xs'>Popular</p>
+        <Heart
+          className={`size-6 text-red-500 stroke-1 cursor-pointer hover:scale-110 hover:animate-spin duration-300 ${wishlist.includes(product._id) ? 'fill-red-500' : ''}`}
+          onClick={() => handleClick(product._id)}
+        />
       </div>
-      <div className='w-full space-y-1'>
+      <Image src={product.mainImage} alt={product.name} width={400} height={400} className='w-[200px] mx-auto aspect-square object-cover' priority />
+      <div className='w-full space-y-0.5'>
         <Link href={`/products/${product.slug}`}>
-          <p className='text-base text-primary'>{product.name}</p>
+          <p className='text-lg font-semibold text-primary'>{product.name}</p>
         </Link>
         <p className='w-full py-1 text-xs text-muted-foreground truncate'>{product.caption}</p>
       </div>
-      <div className='py-2 flex items-center justify-between w-full'>
+      <div className='w-full mt-auto flex flex-col items-start justify-between gap-2'>
         <p>&#8377; {product.discountPrice || product.originalPrice}</p>
-        <Link href={`/products/${product.slug}`} className='px-5 py-1.5 bg-orange-500 text-white rounded-lg text-sm'>
+        <Link href={`/products/${product.slug}`} className='w-full px-5 py-2.5 bg-[#156c56] text-white text-center rounded-md text-sm font-light'>
           Buy Now
         </Link>
       </div>
@@ -78,4 +77,4 @@ const ProductCard = ({ product }: ProductCardProps) => {
   );
 };
 
-export default ProductCard;
+export default ProductCard1;

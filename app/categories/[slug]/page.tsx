@@ -25,7 +25,7 @@ const CategoryPage = async ({ params }: { params: Promise<{ slug: string }> }) =
 
   return (
     <div className='w-full flex flex-col items-center justify-center gap-12'>
-      <h1 className='text-3xl font-medium capitalize relative after:content-[""] after:h-0.5 after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-400'>
+      <h1 className='text-3xl font-medium capitalize relative after:content-[""] after:h-0.5 after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-500'>
         {slug}
       </h1>
 

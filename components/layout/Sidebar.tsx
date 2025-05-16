@@ -1,6 +1,6 @@
 'use client';
 
-import { ChartColumnStacked, Heart, House, LayoutDashboard, MapPinHouse, Menu, Package, PackageOpen, PanelRightClose, ShoppingCart, UserPen, X } from 'lucide-react';
+import { ChartColumnStacked, Heart, House, LayoutDashboard, MapPinHouse, Menu, Package, PackageOpen, PanelRightClose, ShoppingCart, UserPen } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
@@ -13,7 +13,6 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import { usePathname, useRouter } from 'next/navigation';
-import path from 'path';
 
 const Sidebar = () => {
   const { name, profilePic, role } = useUserStore();
@@ -87,7 +86,7 @@ const Sidebar = () => {
           <div className='w-full py-8 px-4 h-full flex flex-col justify-start'>
             <div className='w-full mb-3 flex items-center justify-between'>
               <Link href={'/'} className='flex items-center gap-2'>
-                <img src='/images/logo.webp' alt='NativeNellai' width={100} height={100} className='w-8 h-full object-cover' />
+                <Image src='/images/logo.webp' alt='NativeNellai' width={100} height={100} className='w-8 h-full object-cover' />
                 <p className='text-lg font-medium text-neutral-950'>nativenellai.com</p>
               </Link>
               <DrawerClose className='cursor-pointer'>

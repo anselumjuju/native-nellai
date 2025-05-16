@@ -1,18 +1,19 @@
+import ProductCard1 from '@/components/ProductCard1';
 import { handleRequest } from '@/lib/serverActions';
-import ProductCard from '../features/ProductCard';
 
-const Hero = async () => {
+const BestSeller = async () => {
   const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
 
   if (!productSuccess) return null;
-
   return (
-    <div className='w-full flex flex-col items-start justify-center gap-12'>
-      <h1 className='text-3xl font-medium'>Popular Products</h1>
-      <div className='w-full h-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8'>
+    <div className='max-w-screen-2xl px-3 md:px-5 mx-auto space-y-12'>
+      {/* Header */}
+      <p className='text-xl font-semibold'>Best Seller</p>
+      {/* Products */}
+      <div className='flex items-stretch justify-start lg:justify-between gap-4 overflow-x-scroll no-scrollbar'>
         {products.map((product: { _id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number }) => (
           <div key={product.slug}>
-            <ProductCard product={product} />
+            <ProductCard1 product={product} />
           </div>
         ))}
       </div>
@@ -20,4 +21,4 @@ const Hero = async () => {
   );
 };
 
-export default Hero;
+export default BestSeller;
