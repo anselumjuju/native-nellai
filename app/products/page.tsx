@@ -12,7 +12,26 @@ interface IProduct {
 }
 
 const Products = async () => {
-  const { data: products, success: productSuccess }: { data: any; success: boolean } = await (await fetch(`${process.env.BASE_URL}/api/products`, { cache: 'reload' })).json();
+  const res = await fetch(`${process.env.BASE_URL}/api/products`, {
+    cache: 'reload',
+  });
+
+  if (!res.ok) {
+    console.error('Failed to fetch products:', res.status);
+    return null;
+  }
+
+  let products = [];
+  let productSuccess = false;
+
+  try {
+    const json = await res.json();
+    products = json.data;
+    productSuccess = json.success;
+  } catch (err) {
+    console.error('Invalid JSON response:', err);
+    return null;
+  }
 
   if (!productSuccess) return null;
 
