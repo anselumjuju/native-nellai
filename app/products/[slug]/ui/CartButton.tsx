@@ -1,16 +1,25 @@
 'use client';
 
 import { handleRequest } from '@/lib/serverActions';
+import useAuthStore from '@/store/authStore';
 import useUserStore from '@/store/userStore';
 import { Minus, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 const CartButton = ({ productId }: { productId: string }) => {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore.getState();
   const { _id, addToCart, cart, reduceFromCart } = useUserStore();
   const [cartCount, setCartCount] = useState(cart.find((item) => item.productId === productId)?.quantity || 0);
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast.error('You are not logged in', { id: 'not-logged-in' });
+      router.push('/login');
+      return;
+    }
     addToCart(productId, 1);
     toast.promise(
       async () => {
@@ -29,6 +38,11 @@ const CartButton = ({ productId }: { productId: string }) => {
   };
 
   const handleReduceFromCart = async () => {
+    if (!isAuthenticated) {
+      toast.error('You are not logged in');
+      router.push('/login');
+      return;
+    }
     reduceFromCart(productId);
     toast.promise(
       async () => {

@@ -10,9 +10,17 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore.getState();
 
   useEffect(() => {
+    const { isAuthenticated } = useAuthStore.getState();
+
+    if (!isAuthenticated) {
+      toast.error('You are not logged in', { id: 'not-logged-in' });
+      router.push('/login');
+      return;
+    }
+
     const unsubscribe = useAuthStore.subscribe((state) => {
       if (!state.isAuthenticated) {
-        toast.error('You are not logged in');
+        toast.error('You are not logged in', { id: 'not-logged-in' });
         router.push('/login');
       }
     });

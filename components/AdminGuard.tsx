@@ -7,14 +7,18 @@ import useUserStore from '@/store/userStore';
 
 const AdminGuard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const { role } = useUserStore.getState();
-
-  const [isAdmin, setIsAdmin] = useState(role === 'admin');
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
-    const unsubscribe = useUserStore.subscribe((state) => setIsAdmin(state.role === 'admin'));
+    const currentRole = useUserStore.getState().role;
+    setIsAdmin(currentRole === 'admin');
+
+    const unsubscribe = useUserStore.subscribe((state) => {
+      setIsAdmin(state.role === 'admin');
+    });
+
     return () => unsubscribe();
-  }, [router]);
+  }, []);
 
   if (!isAdmin) {
     return (
@@ -23,7 +27,7 @@ const AdminGuard = ({ children }: { children: React.ReactNode }) => {
         <p className='max-w-[40ch] text-sm text-muted-foreground'>
           Unauthorized access detected. Your account does not have the required privileges to view this content. If you need access, please consult with your system administrator.
         </p>
-        <Button onClick={() => router.push('/')} size={'lg'} className='mt-4 text-nowrap'>
+        <Button onClick={() => router.push('/')} size='lg' className='mt-4 text-nowrap'>
           Go to Home
         </Button>
       </div>
@@ -32,5 +36,4 @@ const AdminGuard = ({ children }: { children: React.ReactNode }) => {
 
   return <>{children}</>;
 };
-
 export default AdminGuard;

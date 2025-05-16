@@ -16,10 +16,15 @@ const BuyNowModal = ({
   products: { _id: string; mainImage: string; name: string; originalPrice: number; discountPrice: number }[];
   total: number;
 }) => {
-  const { _id, cart, clearCart, addToOrders } = useUserStore();
+  const { _id, address, cart, clearCart, addToOrders } = useUserStore();
   const router = useRouter();
 
   const handleBuyNow = async () => {
+    if (!address || !address.street?.trim() || !address.city?.trim() || !address.state?.trim() || !address.zipCode?.trim() || !address.country?.trim()) {
+      toast.error('Please complete your address details before proceeding.', { id: 'address-error', duration: 5000 });
+      router.push('/settings');
+      return;
+    }
     const res = await fetch('/api/createOrder', {
       method: 'POST',
       body: JSON.stringify({ amount: amount * 100 }),
