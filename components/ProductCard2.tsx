@@ -56,7 +56,7 @@ const ProductCard2 = ({ product }: ProductCard2Props) => {
     <div className='w-72 h-full flex flex-col items-start justify-start gap-3 rounded-lg overflow-hidden relative bg-[#f6f6f6]'>
       <div className='w-full flex items-center justify-between'>
         <p className='px-6 py-2 bg-orange-500 text-white rounded-br-lg text-xs'>Popular</p>
-        {product.categoryId == '67b599807ada422f91956cfc' && <p className='px-6 py-2 bg-gradient-to-r from-[#36c057] to-[#10cc78] text-white rounded-bl-lg text-xs'>Organic</p>}
+        {product.categoryId == '67b599807ada422f91956cfc' && <p className='px-6 py-2 bg-linear-to-r from-[#36c057] to-[#10cc78] text-white rounded-bl-lg text-xs'>Organic</p>}
       </div>
       <Image src={product.mainImage} alt={product.name} width={400} height={400} className='w-[200px] mx-auto flex-1 aspect-square object-cover' priority />
       <div className='w-full p-2 space-y-2'>

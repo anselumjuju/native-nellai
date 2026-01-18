@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const Illustration1 = () => {
   return (
-    <div className='max-w-screen-2xl px-3 md:px-5 mx-auto'>
+    <div className='max-w-(--breakpoint-2xl) px-3 md:px-5 mx-auto'>
       <div className='h-[600px] md:h-[500px] bg-[#5f6704] rounded-lg relative overflow-hidden'>
         {/* Content */}
         <div className='pt-10 px-3 md:px-5 md:pt-0 w-full h-full relative z-10 flex flex-col items-start justify-start md:justify-center gap-2 text-white'>
@@ -36,7 +36,7 @@ const Illustration1 = () => {
             alt='product'
             width={400}
             height={400}
-            className='w-[500px] md:w-[600px] h-max object-cover absolute -bottom-[30%] md:-bottom-[40%] -right-[40%] md:-right-[25%] xl:-right-[10%] rotate-[75deg] z-0'
+            className='w-[500px] md:w-[600px] h-max object-cover absolute -bottom-[30%] md:-bottom-[40%] -right-[40%] md:-right-[25%] xl:-right-[10%] rotate-75 z-0'
           />
           <Image src={'/images/mint.webp'} alt='product' width={400} height={400} className='w-[400px] md:w-[500px] h-max object-cover absolute bottom-0 right-0 z-0' />
         </>

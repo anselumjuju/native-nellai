@@ -1,15 +1,17 @@
 'use server';
 
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export interface HandleRequestProps {
 	endpoint: 'categories' | 'locations' | 'orders' | 'products' | 'reviews' | 'users';
 	method?: 'GET' | 'POST' | 'DELETE' | 'PATCH';
 	id?: string;
 	data?: FormData | object;
+	cache?: RequestCache;
+	next?: NextFetchRequestConfig;
 }
 
-export async function handleRequest({ endpoint, method = 'GET', id, data }: HandleRequestProps) {
+export async function handleRequest({ endpoint, method = 'GET', id, data, cache, next }: HandleRequestProps) {
 	try {
 		const url = `${process.env.BASE_URL}/api/${endpoint}${id && method !== 'POST' ? `/${id}` : ''}`;
 
@@ -36,13 +38,20 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 			method,
 			headers,
 			body,
-			cache: 'reload',
+			cache,
+			next,
 		});
 
 		if (!res.ok) throw new Error(res.statusText);
 		const resData = await res.json();
 
-		if (method !== 'GET') revalidate(`/admin/${endpoint}`);
+		if (method !== 'GET') {
+			revalidate(endpoint);
+			if (endpoint === 'products') {
+				revalidate('categories');
+				revalidate('locations');
+			}
+		}
 
 		return resData;
 
@@ -52,6 +61,6 @@ export async function handleRequest({ endpoint, method = 'GET', id, data }: Hand
 	}
 }
 
-export async function revalidate(url: string) {
-	revalidatePath(url);
+export async function revalidate(tag: string) {
+	revalidateTag(tag, 'default');
 }

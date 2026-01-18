@@ -35,7 +35,7 @@ const ProductsPage = async () => {
 
   return (
     <div className='py-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
-      <div className='w-full max-w-screen-xl flex items-center justify-between'>
+      <div className='w-full max-w-(--breakpoint-xl) flex items-center justify-between'>
         <h1 className='text-lg font-semibold'>Products</h1>
         <Link href='/admin/products/new'>
           <Button variant={'outline'}>
@@ -44,7 +44,7 @@ const ProductsPage = async () => {
           </Button>
         </Link>
       </div>
-      <div className='w-full max-w-screen-xl overflow-hidden rounded-lg border border-border bg-background'>
+      <div className='w-full max-w-(--breakpoint-xl) overflow-hidden rounded-lg border border-border bg-background'>
         <Table>
           <TableHeader>
             <TableRow className='hover:bg-transparent *:text-nowrap'>

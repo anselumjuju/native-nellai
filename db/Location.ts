@@ -18,18 +18,16 @@ const LocationSchema = new Schema<ILocation>(
 	{ timestamps: true }
 );
 
-LocationSchema.pre("save", function (next) {
+LocationSchema.pre("save", async function (this: ILocation) {
 	if (!this.slug) {
 		this.slug = slugify(this.name, { lower: true, strict: true });
 	}
-	next();
 });
 
-LocationSchema.pre("findOneAndUpdate", async function (next) {
+LocationSchema.pre("findOneAndUpdate", async function (this: any) {
 	const update: UpdateQuery<ILocation> | null = this.getUpdate();
-	if (!update) return next();
+	if (!update) return;
 	if (update.name) update.slug = slugify(update.name, { lower: true, strict: true });
-	next();
 });
 
 export default mongoose.models.Location || mongoose.model<ILocation>("Location", LocationSchema);

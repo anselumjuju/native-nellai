@@ -49,7 +49,7 @@ const SideBar = () => {
       </div>
 
       {/* Nav for Tablets */}
-      <div className='min-w-40 lg:min-w-52 w-auto hidden md:flex flex-col items-start justify-start after:content-[""] after:absolute after:w-0.5 after:h-[100%] after:bg-muted-foreground/30 after:right-5 after:rounded-full sticky top-10'>
+      <div className='min-w-40 lg:min-w-52 w-auto hidden md:flex flex-col items-start justify-start after:content-[""] after:absolute after:w-0.5 after:h-full after:bg-muted-foreground/30 after:right-5 after:rounded-full sticky top-10'>
         <NavLink to={`/locations`} matchMode='exact' className='w-full px-3 py-2 text-muted-foreground capitalize text-nowrap' activeClassName='text-primary font-medium'>
           All
         </NavLink>

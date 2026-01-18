@@ -7,9 +7,9 @@ import BuyNowButton from './ui/BuyNowButton';
 const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
 
-  const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
-  const { data: categories, success: categorySuccess } = await handleRequest({ endpoint: 'categories' });
-  const { data: locations, success: locationSuccess } = await handleRequest({ endpoint: 'locations' });
+  const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products', next: { tags: ['products'], revalidate: 2592000 } });
+  const { data: categories, success: categorySuccess } = await handleRequest({ endpoint: 'categories', next: { tags: ['categories'], revalidate: 2592000 } });
+  const { data: locations, success: locationSuccess } = await handleRequest({ endpoint: 'locations', next: { tags: ['locations'], revalidate: 2592000 } });
   const product = products.find((product: { slug: string }) => product.slug === slug);
   const category = categories.find((category: { _id: string }) => category._id === product?.categoryId);
   const location = locations.find((location: { _id: string }) => location._id === product?.locationId);
@@ -24,7 +24,7 @@ const ProductPage = async ({ params }: { params: Promise<{ slug: string }> }) =>
   }
 
   return (
-    <div className='w-full max-w-screen-xl px-3 md:px-5 py-10 mx-auto space-y-8'>
+    <div className='w-full max-w-(--breakpoint-xl) px-3 md:px-5 py-10 mx-auto space-y-8'>
       <div className='flex flex-col md:flex-row items-start justify-center gap-5 gap-x-16'>
         <div className='w-full md:w-[90%] lg:w-[70%] bg-neutral-200 rounded-xl'>
           <Image src={product.mainImage} alt={product.name} width={100} height={100} className='size-full' priority unoptimized />

@@ -21,35 +21,31 @@ const ReviewSchema = new Schema<IReview>(
 	{ timestamps: true }
 );
 
-ReviewSchema.pre("save", async function (next) {
+ReviewSchema.pre("save", async function (this: IReview) {
 	const product = await Product.findById(this.productId);
 	if (!product) throw new Error("Invalid productId: Product does not exist");
 
 	const user = await User.findById(this.userId);
 	if (!user) throw new Error("Invalid userId: User does not exist");
-
-	next();
 });
 
-ReviewSchema.post("save", async function (doc, next) {
+ReviewSchema.post("save", async function (doc) {
 	try {
 		await Product.findByIdAndUpdate(doc.productId, {
 			$push: { reviews: doc._id }
 		});
-		next();
 	} catch (error) {
 		throw new Error("Invalid productId: Product does not exist");
 	}
 });
 
-ReviewSchema.post("findOneAndDelete", async function (doc, next) {
+ReviewSchema.post("findOneAndDelete", async function (doc) {
 	try {
 		if (doc) {
 			await Product.findByIdAndUpdate(doc.productId, {
 				$pull: { reviews: doc._id }
 			});
 		}
-		next();
 	} catch (error) {
 		throw new Error("Invalid productId: Product does not exist");
 	}

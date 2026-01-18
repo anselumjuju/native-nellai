@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const Illustration3 = () => {
   return (
-    <div className='max-w-screen-2xl px-3 lg:px-5 mx-auto'>
+    <div className='max-w-(--breakpoint-2xl) px-3 lg:px-5 mx-auto'>
       <div className='h-[600px] lg:h-[400px] bg-[#deeac2] rounded-lg relative overflow-hidden'>
         {/* Content */}
         <div className='pt-10 px-3 lg:px-5 lg:pt-0 h-full flex flex-col lg:flex-row items-start lg:items-center justify-end lg:justify-center gap-4 text-white relative z-10'>

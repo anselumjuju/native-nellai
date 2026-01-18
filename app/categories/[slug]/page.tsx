@@ -14,8 +14,12 @@ interface IProduct {
 const CategoryPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
 
-  const { data: products, success: productSuccess }: { data: any; success: boolean } = await (await fetch(`${process.env.BASE_URL}/api/products`, { cache: 'reload' })).json();
-  const { data: categories, success: categorySuccess }: { data: any; success: boolean } = await (await fetch(`${process.env.BASE_URL}/api/categories`, { cache: 'reload' })).json();
+  const { data: products, success: productSuccess }: { data: any; success: boolean } = await (
+    await fetch(`${process.env.BASE_URL}/api/products`, { next: { tags: ['products'], revalidate: 2592000 } })
+  ).json();
+  const { data: categories, success: categorySuccess }: { data: any; success: boolean } = await (
+    await fetch(`${process.env.BASE_URL}/api/categories`, { next: { tags: ['categories'], revalidate: 2592000 } })
+  ).json();
 
   if (!productSuccess || !categorySuccess) return null;
   const category = categories.find((category: { slug: string }) => category.slug === slug);

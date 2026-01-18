@@ -184,7 +184,7 @@ const Admin = () => {
   }
 
   return (
-    <div className='size-full max-w-screen-2xl mx-auto py-20 px-3 space-y-12'>
+    <div className='size-full max-w-(--breakpoint-2xl) mx-auto py-20 px-3 space-y-12'>
       {/* Overview Cards */}
       <div className='space-y-6'>
         <h1 className='text-2xl'>Admin Insights</h1>

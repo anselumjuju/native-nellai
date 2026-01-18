@@ -14,8 +14,12 @@ interface IProduct {
 const LocationPage = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
 
-  const { data: products, success: productSuccess }: { data: any; success: boolean } = await (await fetch(`${process.env.BASE_URL}/api/products`, { cache: 'reload' })).json();
-  const { data: locations, success: locationSuccess }: { data: any; success: boolean } = await (await fetch(`${process.env.BASE_URL}/api/locations`, { cache: 'reload' })).json();
+  const { data: products, success: productSuccess }: { data: any; success: boolean } = await (
+    await fetch(`${process.env.BASE_URL}/api/products`, { next: { tags: ['products'], revalidate: 2592000 } })
+  ).json();
+  const { data: locations, success: locationSuccess }: { data: any; success: boolean } = await (
+    await fetch(`${process.env.BASE_URL}/api/locations`, { next: { tags: ['locations'], revalidate: 2592000 } })
+  ).json();
 
   if (!productSuccess || !locationSuccess) return null;
   const location = locations.find((location: { slug: string }) => location.slug === slug);

@@ -32,8 +32,8 @@ const OrdersPage = async () => {
 
   return (
     <div className='py-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
-      <h1 className='w-full max-w-screen-xl text-lg font-semibold'>Orders</h1>
-      <div className='w-full max-w-screen-xl overflow-hidden rounded-lg border border-border bg-background'>
+      <h1 className='w-full max-w-(--breakpoint-xl) text-lg font-semibold'>Orders</h1>
+      <div className='w-full max-w-(--breakpoint-xl) overflow-hidden rounded-lg border border-border bg-background'>
         <Table>
           <TableHeader>
             <TableRow className='hover:bg-transparent'>

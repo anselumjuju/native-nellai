@@ -55,9 +55,9 @@ const UserSchema = new Schema<IUser>(
 	{ timestamps: true }
 );
 
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (this: IUser) {
 	if (!this.isModified("wishlist") && !this.isModified("cart") && !this.isModified("orders")) {
-		return next();
+		return;
 	}
 
 	if (this.wishlist.length > 0) {
@@ -80,8 +80,6 @@ UserSchema.pre("save", async function (next) {
 
 		this.orders = this.orders.filter((id) => validOrderIds.includes(id));
 	}
-
-	next();
 });
 
 

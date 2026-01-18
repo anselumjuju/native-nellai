@@ -16,7 +16,7 @@ const Header = () => {
 
   return (
     <div className='w-full px-3 md:px-5 shadow-md shadow-neutral-100'>
-      <header className='w-full max-w-screen-2xl mx-auto py-4 flex items-center justify-between gap-4'>
+      <header className='w-full max-w-(--breakpoint-2xl) mx-auto py-4 flex items-center justify-between gap-4'>
         <Link href={'/'} className='w-max h-12'>
           <Image src={'/images/logo-v.webp'} alt='logo' width={100} height={100} className='w-max h-full object-cover' unoptimized priority />
         </Link>

@@ -1,11 +1,12 @@
-import type { Metadata } from 'next';
-import { Outfit } from 'next/font/google';
+import type {Metadata} from 'next';
+import {Outfit} from 'next/font/google';
 import './globals.css';
-import { Toaster } from 'react-hot-toast';
+import {Analytics} from '@vercel/analytics/next';
+import {Toaster} from 'react-hot-toast';
 import AuthListener from '@/components/AuthListener';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { ThemeProvider } from '@/components/theme-provider';
+import {ThemeProvider} from '@/components/theme-provider';
 import ThemeUpdate from '@/components/ThemeUpdate';
 
 const outfit = Outfit({
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
     shortcut: '/images/logo.webp',
     apple: '/images/logo.webp',
   },
-  authors: [{ name: 'R10S Digital Solutions' }],
+  authors: [{name: 'R10S Digital Solutions'}],
   creator: 'R10S Digital Solutions',
 };
 
@@ -59,9 +60,10 @@ export default async function RootLayout({
       <ThemeProvider attribute='class' defaultTheme='light' disableTransitionOnChange>
         <AuthListener />
         <ThemeUpdate />
+        <Analytics />
         <body className={`${outfit.variable} font-outfit antialiased`}>
           <Header />
-          <div className='min-h-[100vh]'>{children}</div>
+          <div className='min-h-screen'>{children}</div>
           <Footer />
           <Toaster position='top-center' />
         </body>

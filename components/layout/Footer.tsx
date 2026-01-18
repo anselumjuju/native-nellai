@@ -11,7 +11,7 @@ const Footer = () => {
 
   return (
     <div className='w-full bg-neutral-900 text-white'>
-      <div className='w-full h-full max-w-screen-2xl mx-auto px-3 md:px-5 py-16 flex flex-wrap items-start justify-between gap-12 bg-neutral-900 text-white'>
+      <div className='w-full h-full max-w-(--breakpoint-2xl) mx-auto px-3 md:px-5 py-16 flex flex-wrap items-start justify-between gap-12 bg-neutral-900 text-white'>
         {/* Logo and name */}
         <div className='flex flex-col items-start justify-center gap-4'>
           <Link href={'/'} className='w-max h-12'>

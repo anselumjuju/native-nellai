@@ -15,6 +15,9 @@ import { uploadImage } from '@/lib/uploadImage';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
+const QUANTITY_OPTIONS = ['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'] as const;
+const STOCK_OPTIONS = ['available', 'unavailable'] as const;
+
 interface ProductFormProps {
   product?: {
     name: string;
@@ -42,11 +45,11 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       mainImage: z.any().refine((file) => (product?.mainImage ? true : file?.length > 0), 'Main Image is required'),
       description: z.string().min(1, 'Product Description is required'),
       about: z.string().min(1, 'About section is required'),
-      quantity: z.enum(['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'], {
-        errorMap: () => ({ message: 'Invalid quantity selected' }),
+      quantity: z.enum(QUANTITY_OPTIONS, {
+        message: 'Invalid quantity selected',
       }),
-      stock: z.enum(['available', 'unavailable'], {
-        errorMap: () => ({ message: 'Invalid stock status' }),
+      stock: z.enum(STOCK_OPTIONS, {
+        message: 'Invalid stock status',
       }),
       categoryId: z.string().min(1, 'Category is required'),
       locationId: z.string().min(1, 'Location is required'),
@@ -62,7 +65,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       {
         message: 'Banner image is required.',
         path: ['bannerImage'],
-      }
+      },
     );
 
   const router = useRouter();
@@ -87,8 +90,8 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       mainImage: null,
       description: product?.description || '',
       about: product?.about || '',
-      quantity: product?.quantity || '',
-      stock: product?.stock || '',
+      quantity: (product?.quantity as any) || undefined,
+      stock: (product?.stock as any) || undefined,
       categoryId: product?.categoryId || '',
       locationId: product?.locationId || '',
       originalPrice: product?.originalPrice || '',
@@ -133,7 +136,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
             console.log(err);
             return !productId ? 'Failed to add product' : 'Failed to update product';
           },
-        }
+        },
       )
       .finally(() => {
         setIsLoading(false);
@@ -167,7 +170,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           Main Image <span className='text-destructive'>*</span>
         </Label>
         <Input {...form.register('mainImage')} type='file' accept='image/*' />
-        {form.formState.errors.mainImage && <p className='text-xs text-red-700'>{form.formState.errors.mainImage.message}</p>}
+        {form.formState.errors.mainImage && <p className='text-xs text-red-700'>{form.formState.errors.mainImage.message as string}</p>}
       </div>
 
       {/* Product Description */}
@@ -203,7 +206,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
                   <SelectValue placeholder='Select Quantity' />
                 </SelectTrigger>
                 <SelectContent>
-                  {['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'].map((quantity) => (
+                  {QUANTITY_OPTIONS.map((quantity) => (
                     <SelectItem key={quantity} value={quantity}>
                       {quantity}
                     </SelectItem>
@@ -227,7 +230,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
                   <SelectValue placeholder='Select Stock' />
                 </SelectTrigger>
                 <SelectContent>
-                  {['available', 'unavailable'].map((stock) => (
+                  {STOCK_OPTIONS.map((stock) => (
                     <SelectItem key={stock} value={stock} className='capitalize placeholder:capitalize'>
                       {stock}
                     </SelectItem>
@@ -325,13 +328,13 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       <div className='space-y-3'>
         <Label>Banner Image</Label>
         <div className='grid lg:grid-cols-2 gap-x-4 gap-y-3'>
-          <div className='relative flex w-full items-start justify-between gap-2 rounded-lg border border-input p-4 py-3 shadow-sm shadow-black/5'>
+          <div className='relative flex w-full items-start justify-between gap-2 rounded-lg border border-input p-4 py-3 shadow-xs shadow-black/5'>
             <Switch
               id='isBanner'
-              className='order-1 h-4 w-6 after:absolute after:inset-0 [&_span]:size-3 [&_span]:data-[state=checked]:translate-x-2 rtl:[&_span]:data-[state=checked]:-translate-x-2'
+              className='order-1 h-4 w-6 after:absolute after:inset-0 [&_span]:size-3 data-[state=checked]:[&_span]:translate-x-2 data-[state=checked]:[&_span]:rtl:-translate-x-2'
               aria-describedby={'isBanner'}
               checked={form.watch('isBanner')}
-              onCheckedChange={(checked) => form.setValue('isBanner', checked)}
+              onCheckedChange={(checked: boolean) => form.setValue('isBanner', checked)}
             />
             <Label htmlFor='isBanner'>Feature as Banner</Label>
           </div>
@@ -342,7 +345,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
             className='h-full p-0 pe-3 file:px-3 file:h-full file:me-3 file:border-0 file:border-e file:border-muted file:py-2 text-primary text-xs'
           />
         </div>
-        {form.formState.errors.bannerImage && <p className='text-xs text-red-700'>{form.formState.errors.bannerImage.message}</p>}
+        {form.formState.errors.bannerImage && <p className='text-xs text-red-700'>{form.formState.errors.bannerImage.message as string}</p>}
       </div>
 
       <Button type='submit' className='w-max self-end'>

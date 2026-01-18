@@ -8,12 +8,12 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
   return (
     <AuthGuard>
       <AdminGuard>
-        <div className='[--header-height:calc(theme(spacing.14))]'>
+        <div className='[--header-height:calc(--spacing(14))]'>
           <SidebarProvider className='flex flex-col'>
             <SiteHeader />
             <div className='flex flex-1'>
               <AppSidebar />
-              <SidebarInset className='!min-h-[calc(100svh-var(--header-height))]'>{children}</SidebarInset>
+              <SidebarInset className='min-h-[calc(100svh-var(--header-height))]!'>{children}</SidebarInset>
             </div>
           </SidebarProvider>
         </div>

@@ -40,10 +40,9 @@ const OrderSchema = new Schema<IOrder>(
 	{ timestamps: true }
 );
 
-OrderSchema.pre("save", async function (next) {
+OrderSchema.pre("save", async function (this: IOrder) {
 	const userExists = await User.findById(this.userId);
 	if (!userExists) throw new Error("Invalid userId: User does not exist");
-	next();
 });
 
 export default mongoose.models.Order || mongoose.model<IOrder>("Order", OrderSchema);

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model, UpdateQuery } from "mongoose";
+import mongoose, { Schema, Document, Model, UpdateQuery, CallbackError } from "mongoose";
 import slugify from "slugify";
 
 export interface ICategory extends Document {
@@ -18,18 +18,16 @@ const CategorySchema = new Schema<ICategory>(
 	{ timestamps: true }
 );
 
-CategorySchema.pre<ICategory>("save", function (next) {
+CategorySchema.pre("save", async function (this: ICategory) {
 	if (!this.slug || this.isModified("name")) {
 		this.slug = slugify(this.name, { lower: true, strict: true });
 	}
-	next();
 });
 
-CategorySchema.pre("findOneAndUpdate", function (next) {
+CategorySchema.pre("findOneAndUpdate", async function (this: any) {
 	const update: UpdateQuery<ICategory> | null = this.getUpdate();
-	if (!update) return next();
+	if (!update) return;
 	if (update.name) update.slug = slugify(update.name, { lower: true, strict: true });
-	next();
 });
 
 const Category: Model<ICategory> = mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema);

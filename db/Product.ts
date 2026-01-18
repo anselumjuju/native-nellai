@@ -44,7 +44,7 @@ const ProductSchema = new Schema<IProduct>(
 	{ timestamps: true }
 );
 
-ProductSchema.pre("save", async function (next) {
+ProductSchema.pre("save", async function (this: IProduct) {
 	if (!this.slug || this.isModified("name")) {
 		this.slug = slugify(this.name, { lower: true, strict: true });
 	}
@@ -58,14 +58,12 @@ ProductSchema.pre("save", async function (next) {
 	if (!locationExists) {
 		throw new Error("Invalid locationId: Location does not exist");
 	}
-
-	next();
 });
 
-ProductSchema.pre("findOneAndUpdate", async function (next) {
+ProductSchema.pre("findOneAndUpdate", async function (this: any) {
 	const update: UpdateQuery<IProduct> | null = this.getUpdate();
 
-	if (!update) return next();
+	if (!update) return;
 
 	if (update.name) update.slug = slugify(update.name, { lower: true, strict: true });
 
@@ -82,8 +80,6 @@ ProductSchema.pre("findOneAndUpdate", async function (next) {
 			throw new Error("Invalid locationId: Location does not exist");
 		}
 	}
-
-	next();
 });
 
 export default mongoose.models.Product || mongoose.model<IProduct>("Product", ProductSchema);

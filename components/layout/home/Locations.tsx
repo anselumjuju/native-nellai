@@ -8,7 +8,7 @@ const Locations = async () => {
 
   if (!locatiosnSuccess) return null;
   return (
-    <div className='max-w-screen-2xl px-3 md:px-5 mx-auto space-y-6'>
+    <div className='max-w-(--breakpoint-2xl) px-3 md:px-5 mx-auto space-y-6'>
       {/* Header */}
       <div className='w-full flex items-center justify-between'>
         <p className='text-xl font-semibold'>Shop by Locations</p>

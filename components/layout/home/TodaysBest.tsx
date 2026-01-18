@@ -17,7 +17,7 @@ const TodaysBest = async () => {
     .slice(0, 5);
 
   return (
-    <div className='max-w-screen-2xl px-3 md:px-5 mx-auto space-y-12'>
+    <div className='max-w-(--breakpoint-2xl) px-3 md:px-5 mx-auto space-y-12'>
       {/* Header */}
       <p className='text-xl font-semibold'>Today best deals for you</p>
       {/* Products */}

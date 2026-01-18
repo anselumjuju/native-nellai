@@ -9,7 +9,7 @@ import TodaysBest from '@/components/layout/home/TodaysBest';
 export default async function Home() {
   return (
     <div className='w-full space-y-20 py-10'>
-      <div className='bg-gradient-to-b from-[#FFFFFF] to-[#fbffea] space-y-20'>
+      <div className='bg-linear-to-b from-[#FFFFFF] to-[#fbffea] space-y-20'>
         <Illustration1 />
         <Categories />
         <BestSeller />

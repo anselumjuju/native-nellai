@@ -29,8 +29,8 @@ const ReviewsPage = async () => {
 
   return (
     <div className='py-20 px-2 md:px-7 flex flex-1 flex-col items-center justify-start gap-4'>
-      <h1 className='w-full max-w-screen-xl text-lg font-semibold'>Reviews</h1>
-      <div className='w-full max-w-screen-lg overflow-hidden space-y-4'>
+      <h1 className='w-full max-w-(--breakpoint-xl) text-lg font-semibold'>Reviews</h1>
+      <div className='w-full max-w-(--breakpoint-lg) overflow-hidden space-y-4'>
         {reviews.map((review: { _id: string; rating: number; comment: string; productId: string; userId: string }) => (
           <div className='space-y-4' key={review._id}>
             <div className='w-full px-2 py-4 flex items-end justify-between gap-4'>
@@ -63,7 +63,7 @@ const ReviewsPage = async () => {
                 alt='Product Image'
                 width={200}
                 height={100}
-                className='h-full max-h-64 aspect-[9/12] rounded-sm hidden lg:block'
+                className='h-full max-h-64 aspect-9/12 rounded-sm hidden lg:block'
               />
             </div>
             <DeleteButton id={review._id} endpoint='reviews' />

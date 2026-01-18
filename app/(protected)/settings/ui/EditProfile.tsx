@@ -25,7 +25,6 @@ const UserDetailsSchema = z.object({
   state: z.string().min(2, 'State must be at least 2 characters'),
   zipCode: z.string().min(2, 'Zip Code must be at least 2 characters'),
   country: z.string().min(2, 'Country must be at least 2 characters'),
-  profilePic: z.string().optional(),
 });
 
 interface IUserDetails {
@@ -37,7 +36,6 @@ interface IUserDetails {
   state: string;
   zipCode: string;
   country: string;
-  profilePic: string | File;
 }
 
 const EditProfile = () => {
@@ -101,12 +99,12 @@ const EditProfile = () => {
         loading: 'Updating user details...',
         success: 'User details updated successfully',
         error: 'Error updating user details',
-      }
+      },
     );
   };
 
   return (
-    <div className='w-full max-w-screen-xl mx-auto px-4'>
+    <div className='w-full max-w-(--breakpoint-xl) mx-auto px-4'>
       {isInitializing ? (
         <div className='size-full flex items-center justify-center'>
           <h1>Fetching user details</h1>
@@ -144,21 +142,21 @@ const EditProfile = () => {
             {/* Profile Details */}
             <form onSubmit={handleSubmit(onSubmit)} className='w-full h-full flex flex-1 flex-col gap-4 relative'>
               <p className='text-lg font-semibold my-3'>User Details</p>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>Name</Label>
                 <div className='w-full space-y-1'>
                   <Input type='text' placeholder='Name' {...register('name')} />
                   {errors.name && <span className='text-red-500 text-sm'>{errors.name.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>Email</Label>
                 <div className='w-full space-y-1'>
                   <Input type='email' placeholder='Name' {...register('email')} />
                   {errors.email && <span className='text-red-500 text-sm'>{errors.email.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>Phone</Label>
                 <div className='w-full space-y-1'>
                   <Input type='tel' placeholder='Phone' {...register('phone')} />
@@ -166,42 +164,42 @@ const EditProfile = () => {
                 </div>
               </div>
               <p className='text-lg font-semibold my-3'>Address</p>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>Street</Label>
                 <div className='w-full space-y-1'>
                   <Input type='text' placeholder='Street' {...register('street')} />
                   {errors.street && <span className='text-red-500 text-sm'>{errors.street.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>City</Label>
                 <div className='w-full space-y-1'>
                   <Input type='text' placeholder='City' {...register('city')} />
                   {errors.city && <span className='text-red-500 text-sm'>{errors.city.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>State</Label>
                 <div className='w-full space-y-1'>
                   <Input type='text' placeholder='State' {...register('state')} />
                   {errors.state && <span className='text-red-500 text-sm'>{errors.state.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>ZipCode</Label>
                 <div className='w-full space-y-1'>
                   <Input type='text' placeholder='ZipCode' {...register('zipCode')} />
                   {errors.zipCode && <span className='text-red-500 text-sm'>{errors.zipCode.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) flex flex-col items-start lg:items-center lg:flex-row gap-2 lg:gap-6'>
                 <Label className='min-w-[10ch] font-normal'>Country</Label>
                 <div className='w-full space-y-1'>
                   <Input type='text' placeholder='Country' {...register('country')} />
                   {errors.country && <span className='text-red-500 text-sm'>{errors.country.message}</span>}
                 </div>
               </div>
-              <div className='w-full lg:max-w-screen-sm mt-6 flex justify-end'>
+              <div className='w-full lg:max-w-(--breakpoint-sm) mt-6 flex justify-end'>
                 <Button variant={'default'} size={'lg'} type='submit' disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>

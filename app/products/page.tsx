@@ -1,5 +1,7 @@
 import ProductCard from '@/components/features/ProductCard';
 
+export const dynamic = 'force-dynamic';
+
 interface IProduct {
   _id: string;
   name: string;
@@ -13,7 +15,7 @@ interface IProduct {
 
 const Products = async () => {
   const res = await fetch(`${process.env.BASE_URL}/api/products`, {
-    cache: 'reload',
+    next: { tags: ['products'], revalidate: 2592000 },
   });
 
   if (!res.ok) {
@@ -36,7 +38,7 @@ const Products = async () => {
   if (!productSuccess) return null;
 
   return (
-    <div className='w-full max-w-screen-xl px-3 md:px-5 py-10 mx-auto flex flex-col items-center justify-center gap-12'>
+    <div className='w-full max-w-(--breakpoint-xl) px-3 md:px-5 py-10 mx-auto flex flex-col items-center justify-center gap-12'>
       <h1 className='text-3xl font-medium capitalize relative after:content-[""] after:h-0.5 after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-4/5 after:bg-orange-500'>
         Discover Our Exclusive Collection
       </h1>
