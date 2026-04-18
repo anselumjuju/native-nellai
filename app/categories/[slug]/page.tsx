@@ -1,5 +1,6 @@
 import ProductCard from '@/components/features/ProductCard';
 
+export const dynamic = 'force-dynamic';
 interface IProduct {
   _id: string;
   name: string;

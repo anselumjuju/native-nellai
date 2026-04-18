@@ -1,8 +1,10 @@
 import ProductCard from '@/components/features/ProductCard';
-import { handleRequest } from '@/lib/serverActions';
 
+export const dynamic = 'force-dynamic';
 const Locations = async () => {
-  const { data: products, success: productSuccess } = await handleRequest({ endpoint: 'products' });
+  const {data: products, success: productSuccess}: {data: any; success: boolean} = await (
+    await fetch(`${process.env.BASE_URL}/api/products`, {next: {tags: ['products'], revalidate: 2592000}})
+  ).json();
 
   if (!productSuccess) return null;
   return (
@@ -12,7 +14,7 @@ const Locations = async () => {
       </h1>
       <div className='w-full h-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8'>
         {products &&
-          products.map((product: { _id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number }) => (
+          products.map((product: {_id: string; name: string; caption: string; mainImage: string; slug: string; originalPrice: number; discountPrice: number}) => (
             <div key={product.slug}>
               <ProductCard product={product} />
             </div>
