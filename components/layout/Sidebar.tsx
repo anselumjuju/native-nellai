@@ -1,22 +1,22 @@
 'use client';
 
-import { ChartColumnStacked, Heart, House, LayoutDashboard, MapPinHouse, Menu, Package, PackageOpen, PanelRightClose, ShoppingCart, UserPen } from 'lucide-react';
+import {ChartColumnStacked, Heart, House, LayoutDashboard, MapPinHouse, Menu, Package, PackageOpen, PanelRightClose, ShoppingCart, UserPen} from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import {Button} from '@/components/ui/button';
+import {Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerTitle, DrawerTrigger} from '@/components/ui/drawer';
 import Image from 'next/image';
 import useUserStore from '@/store/userStore';
-import { Separator } from '@/components/ui/separator';
+import {Separator} from '@/components/ui/separator';
 import useAuthStore from '@/store/authStore';
 import Link from 'next/link';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import {signOut} from 'firebase/auth';
+import {auth} from '@/lib/firebase';
 import toast from 'react-hot-toast';
-import { usePathname, useRouter } from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 
 const Sidebar = () => {
-  const { name, profilePic, role } = useUserStore();
-  const { isAuthenticated } = useAuthStore();
+  const {name, profilePic, role} = useUserStore();
+  const {isAuthenticated} = useAuthStore();
   const router = useRouter();
   const pathName = usePathname();
 
@@ -25,7 +25,7 @@ const Sidebar = () => {
       await signOut(auth);
       toast.success('Signed out successfully');
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -150,7 +150,7 @@ const Sidebar = () => {
             </div>
 
             <DrawerFooter className='p-0'>
-              {isAuthenticated ? (
+              {isAuthenticated ?
                 <div className='mt-auto space-y-4'>
                   <Separator />
                   <div className='flex items-center gap-2'>
@@ -164,13 +164,12 @@ const Sidebar = () => {
                     </Button>
                   </DrawerClose>
                 </div>
-              ) : (
-                <DrawerClose asChild>
+              : <DrawerClose asChild>
                   <Button variant={'default'} onClick={() => router.push('/login')} className={'w-full'} size={'lg'}>
                     Login
                   </Button>
                 </DrawerClose>
-              )}
+              }
             </DrawerFooter>
           </div>
         </DrawerDescription>

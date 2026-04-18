@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 			try {
 				body.items = JSON.parse(body.items);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,

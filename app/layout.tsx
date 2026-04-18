@@ -57,17 +57,17 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <ThemeProvider attribute='class' defaultTheme='light' disableTransitionOnChange>
-        <AuthListener />
-        <ThemeUpdate />
-        <Analytics />
-        <body className={`${outfit.variable} font-outfit antialiased`}>
+      <body className={`${outfit.variable} font-outfit antialiased`}>
+        <ThemeProvider attribute='class' defaultTheme='light' disableTransitionOnChange>
+          <AuthListener />
+          <ThemeUpdate />
+          <Analytics />
           <Header />
           <div className='min-h-screen'>{children}</div>
           <Footer />
           <Toaster position='top-center' />
-        </body>
-      </ThemeProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

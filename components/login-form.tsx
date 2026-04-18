@@ -1,36 +1,36 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {cn} from '@/lib/utils';
+import {Button} from '@/components/ui/button';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import {useForm} from 'react-hook-form';
+import {z} from 'zod';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup} from 'firebase/auth';
+import {auth} from '@/lib/firebase';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { handleRequest } from '@/lib/serverActions';
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
+import {handleRequest} from '@/lib/serverActions';
 import useUserStore from '@/store/userStore';
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  email: z.string().email({message: 'Invalid email address'}),
+  password: z.string().min(6, {message: 'Password must be at least 6 characters'}),
 });
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function LoginForm({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useUserStore();
+  const {setUser} = useUserStore();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {errors},
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,10 +53,10 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             return 'Logged in successfully';
           },
           error: 'Error logging in',
-        }
+        },
       );
     } catch (err) {
-      console.log(err);
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -68,11 +68,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       toast.promise(
         async () => {
           const provider = new GoogleAuthProvider();
-          const { user } = await signInWithPopup(auth, provider);
+          const {user} = await signInWithPopup(auth, provider);
           if (!user) return;
 
-          const { data: usersData } = await handleRequest({ endpoint: 'users' });
-          const userData = usersData.find((u: { uid: string }) => u.uid === user.uid);
+          const {data: usersData} = await handleRequest({endpoint: 'users'});
+          const userData = usersData.find((u: {uid: string}) => u.uid === user.uid);
 
           if (!userData) {
             const formData = new FormData();
@@ -81,22 +81,22 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             formData.append('email', `${user.email}`);
             formData.append('phone', `${user.phoneNumber || ''}`);
             formData.append('profilePic', `${user.photoURL}`);
-            const { data: userData } = await handleRequest({ endpoint: 'users', method: 'POST', data: formData });
-            setUser({ _id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user' });
+            const {data: userData} = await handleRequest({endpoint: 'users', method: 'POST', data: formData});
+            setUser({_id: userData._id, name: user.displayName || '', email: user.email || '', phone: user.phoneNumber || '', profilePic: user.photoURL || '', role: 'user'});
             return router.push('/setup');
           }
 
-          setUser({ _id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role });
+          setUser({_id: userData._id, name: userData.name, email: userData.email, phone: userData.phone, profilePic: userData.profilePic, role: userData.role});
           router.push('/');
         },
         {
           loading: 'Logging in...',
           success: 'Logged in successfully',
           error: 'Error logging in',
-        }
+        },
       );
     } catch (err) {
-      console.log(err);
+      console.error(err);
     } finally {
       setIsLoading(false);
     }

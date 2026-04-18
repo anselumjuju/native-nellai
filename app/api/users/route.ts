@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 			try {
 				body.address = JSON.parse(body.address);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 			try {
 				body.cart = JSON.parse(body.cart);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 			try {
 				body.wishlist = JSON.parse(body.wishlist);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 			try {
 				body.orders = JSON.parse(body.orders);
 			} catch (error) {
-				console.log(error);
+				console.error(error);
 				return NextResponse.json({
 					status: 400,
 					success: false,

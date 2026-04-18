@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import dns from "node:dns";
 
 interface MongooseGlobal {
 	conn: typeof mongoose | null;
@@ -15,18 +16,31 @@ if (!MONGODB_URI) {
 }
 
 async function connectToDatabase() {
+	dns.setServers(["8.8.8.8", "8.8.4.4"]);
 	if (mongooseGlobal.conn) return mongooseGlobal.conn;
 
 	if (!MONGODB_URI) {
+		console.error("MONGODB_URI is not defined!");
 		throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
 	}
 
-	if (!mongooseGlobal.promise) {
-		mongooseGlobal.promise = mongoose.connect(MONGODB_URI).then((mongoose) => mongoose);
-	}
+	try {
+		if (!mongooseGlobal.promise) {
+			// To avoid logging sensitive info, we only log the start and end of the URI or length
+			const maskedUri = MONGODB_URI.replace(/:([^@]+)@/, ":****@");
 
-	mongooseGlobal.conn = await mongooseGlobal.promise;
-	return mongooseGlobal.conn;
+			mongooseGlobal.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+				return mongoose;
+			});
+		}
+
+		mongooseGlobal.conn = await mongooseGlobal.promise;
+		return mongooseGlobal.conn;
+	} catch (error) {
+		console.error("MongoDB connection error:", error);
+		mongooseGlobal.promise = null; // Reset promise on error so we can retry
+		throw error;
+	}
 }
 
 export default connectToDatabase;

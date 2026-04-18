@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import {useEffect, useState} from 'react';
+import {Controller, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { handleRequest } from '@/lib/serverActions';
-import { uploadImage } from '@/lib/uploadImage';
+import {Button} from '@/components/ui/button';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
+import {Switch} from '@/components/ui/switch';
+import {Label} from '@/components/ui/label';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {handleRequest} from '@/lib/serverActions';
+import {uploadImage} from '@/lib/uploadImage';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 const QUANTITY_OPTIONS = ['1/2kg', '1kg', '2kg', '1ltr', '2ltr', '1pc', '2pc'] as const;
 const STOCK_OPTIONS = ['available', 'unavailable'] as const;
@@ -37,7 +37,7 @@ interface ProductFormProps {
   productId?: string;
 }
 
-const ProductForm = ({ product, productId }: ProductFormProps) => {
+const ProductForm = ({product, productId}: ProductFormProps) => {
   const formSchema = z
     .object({
       name: z.string().min(1, 'Product Name is required'),
@@ -69,14 +69,14 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
     );
 
   const router = useRouter();
-  const [locations, setLocations] = useState<{ _id: string; name: string }[]>([]);
-  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+  const [locations, setLocations] = useState<{_id: string; name: string}[]>([]);
+  const [categories, setCategories] = useState<{_id: string; name: string}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const { data: categories } = await handleRequest({ endpoint: 'categories' });
-      const { data: locations } = await handleRequest({ endpoint: 'locations' });
+      const {data: categories} = await handleRequest({endpoint: 'categories'});
+      const {data: locations} = await handleRequest({endpoint: 'locations'});
       setCategories(categories);
       setLocations(locations);
     })();
@@ -121,9 +121,9 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           formData.append('isBanner', data.isBanner.toString());
           if (data.bannerImage) formData.append('bannerImage', await uploadImage(data.bannerImage[0]));
           if (!productId) {
-            await handleRequest({ endpoint: 'products', method: 'POST', data: formData });
+            await handleRequest({endpoint: 'products', method: 'POST', data: formData});
           } else {
-            await handleRequest({ endpoint: 'products', method: 'PATCH', data: formData, id: productId });
+            await handleRequest({endpoint: 'products', method: 'PATCH', data: formData, id: productId});
           }
         },
         {
@@ -133,7 +133,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
             return !productId ? 'Product added successfully' : 'Product updated successfully';
           },
           error: (err: any) => {
-            console.log(err);
+            console.error(err);
             return !productId ? 'Failed to add product' : 'Failed to update product';
           },
         },
@@ -200,7 +200,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           <Controller
             control={form.control}
             name='quantity'
-            render={({ field }) => (
+            render={({field}) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Quantity' />
@@ -224,7 +224,7 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           <Controller
             control={form.control}
             name='stock'
-            render={({ field }) => (
+            render={({field}) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Stock' />
@@ -252,23 +252,22 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           <Controller
             control={form.control}
             name='categoryId'
-            render={({ field }) => (
+            render={({field}) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Category' />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.length < 1 ? (
+                  {categories.length < 1 ?
                     <SelectItem value='0' disabled>
                       No categories found
                     </SelectItem>
-                  ) : (
-                    categories.map((category) => (
+                  : categories.map((category) => (
                       <SelectItem key={category._id} value={category._id}>
                         {category.name}
                       </SelectItem>
                     ))
-                  )}
+                  }
                 </SelectContent>
               </Select>
             )}
@@ -282,23 +281,22 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
           <Controller
             control={form.control}
             name='locationId'
-            render={({ field }) => (
+            render={({field}) => (
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder='Select Location' />
                 </SelectTrigger>
                 <SelectContent>
-                  {locations.length < 1 ? (
+                  {locations.length < 1 ?
                     <SelectItem value='0' disabled>
                       No Locations found
                     </SelectItem>
-                  ) : (
-                    locations.map((location) => (
+                  : locations.map((location) => (
                       <SelectItem key={location._id} value={location._id}>
                         {location.name}
                       </SelectItem>
                     ))
-                  )}
+                  }
                 </SelectContent>
               </Select>
             )}
@@ -349,7 +347,13 @@ const ProductForm = ({ product, productId }: ProductFormProps) => {
       </div>
 
       <Button type='submit' className='w-max self-end'>
-        {!productId ? (isLoading ? 'Adding Product...' : 'Add Product') : isLoading ? 'Updating Product...' : 'Update Product'}
+        {!productId ?
+          isLoading ?
+            'Adding Product...'
+          : 'Add Product'
+        : isLoading ?
+          'Updating Product...'
+        : 'Update Product'}
       </Button>
     </form>
   );

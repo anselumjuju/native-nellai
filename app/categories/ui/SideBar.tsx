@@ -1,21 +1,21 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { handleRequest } from '@/lib/serverActions';
-import { ArrowDown } from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {handleRequest} from '@/lib/serverActions';
+import {ArrowDown} from 'lucide-react';
 import NavLink from 'next-navlink';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import {usePathname} from 'next/navigation';
+import {useEffect, useState} from 'react';
 
 const SideBar = () => {
   const path = usePathname();
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{slug: string; name: string}[]>([]);
 
   useEffect(() => {
     (async () => {
-      const { data: categories } = await handleRequest({ endpoint: 'categories' });
+      const {data: categories} = await handleRequest({endpoint: 'categories'});
       setCategories(categories);
     })();
   }, []);
@@ -37,13 +37,15 @@ const SideBar = () => {
                 All
               </NavLink>
             </DropdownMenuItem>
-            {categories.map((item) => (
-              <DropdownMenuItem key={item.slug}>
-                <NavLink to={`/categories/${item.slug}`} className='w-full capitalize' onClick={() => setOpen(false)}>
-                  {item.slug}
-                </NavLink>
-              </DropdownMenuItem>
-            ))}
+            {categories &&
+              categories.length > 0 &&
+              categories.map((item) => (
+                <DropdownMenuItem key={item.slug}>
+                  <NavLink to={`/categories/${item.slug}`} className='w-full capitalize' onClick={() => setOpen(false)}>
+                    {item.slug}
+                  </NavLink>
+                </DropdownMenuItem>
+              ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -53,16 +55,18 @@ const SideBar = () => {
         <NavLink to={`/categories`} matchMode='exact' className='w-full px-3 py-2 text-muted-foreground capitalize text-nowrap' activeClassName='text-primary font-medium'>
           All
         </NavLink>
-        {categories.map((item) => (
-          <NavLink
-            to={`/categories/${item.slug}`}
-            matchMode='exact'
-            className='w-1/2 px-3 py-2 text-muted-foreground capitalize text-nowrap'
-            activeClassName='text-primary font-medium'
-            key={item.slug}>
-            {item.name}
-          </NavLink>
-        ))}
+        {categories &&
+          categories.length > 0 &&
+          categories.map((item) => (
+            <NavLink
+              to={`/categories/${item.slug}`}
+              matchMode='exact'
+              className='w-1/2 px-3 py-2 text-muted-foreground capitalize text-nowrap'
+              activeClassName='text-primary font-medium'
+              key={item.slug}>
+              {item.name}
+            </NavLink>
+          ))}
       </div>
     </>
   );
